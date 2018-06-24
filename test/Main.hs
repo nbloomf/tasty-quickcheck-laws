@@ -3,16 +3,20 @@ module Main where
 import Test.Tasty
 import Data.Proxy
 
+import Test.Tasty.QuickCheck.Laws.Functor
 import Test.Tasty.QuickCheck.Laws.Monad
 
 
 main :: IO ()
 main = defaultMain $
   testGroup "Laws"
-    [ testGroup "Monad Laws"
-      [ test_monad_laws_3 pMb pU pB pI (==)
-      , test_monad_laws_3 pEi pU pB pI (==)
-      , test_monad_laws_3 pLs pU pB pI (==)
+    [ testGroup "Functor Laws"
+      [ testFunctorLaws3 pMb pU pB pI (==)
+      ]
+    , testGroup "Monad Laws"
+      [ testMonadLaws3 pMb pU pB pI (==)
+      , testMonadLaws3 pEi pU pB pI (==)
+      , testMonadLaws3 pLs pU pB pI (==)
       ]
     ]
 

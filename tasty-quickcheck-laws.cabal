@@ -33,6 +33,7 @@ library
 
   exposed-modules:
       Test.Tasty.QuickCheck.Laws.Class
+      Test.Tasty.QuickCheck.Laws.Functor
       Test.Tasty.QuickCheck.Laws.Monad
 
 
