@@ -11,3 +11,4 @@ Currently includes laws for the following type classes:
 * Functor
 * Applicative
 * Monad
+* Eq

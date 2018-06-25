@@ -2,15 +2,22 @@ module Main where
 
 import Test.Tasty
 import Data.Proxy
+import System.Environment
 
 import Test.Tasty.QuickCheck.Laws
 
 
 
 main :: IO ()
-main = defaultMain $
-  testGroup "Laws"
-    [ testGroup "Functor Laws"
+main = do
+  setEnv "NUM_TASTY_THREADS" "4"
+  defaultMain $ testGroup "Laws"
+    [ testGroup "Eq Laws"
+      [ testEqLaws pU
+      , testEqLaws pB
+      , testEqLaws pI
+      ]
+    , testGroup "Functor Laws"
       [ testFunctorLaws3 pMb pU pU pB pI (const (==))
       , testFunctorLaws3 pEi pU pU pB pI (const (==))
       , testFunctorLaws3 pLs pU pU pB pI (const (==))
