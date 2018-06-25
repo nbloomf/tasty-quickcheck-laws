@@ -1,4 +1,7 @@
-# tasty-quickcheck-laws
+tasty-quickcheck-laws
+=====================
+
+[![Build Status](https://travis-ci.org/nbloomf/tasty-quickcheck-laws.svg?branch=master)](https://travis-ci.org/nbloomf/tasty-quickcheck-laws)
 
 Pre-built tasty test trees for common properties using QuickCheck
 
