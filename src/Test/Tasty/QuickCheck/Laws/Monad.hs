@@ -33,15 +33,15 @@ import Test.Tasty.QuickCheck.Laws.Class
 testMonadLaws
   :: ( Monad m
      , Eq a, Eq b, Eq c
-     , Show a, Show (m a)
-     , Arbitrary a, Arbitrary (m a), Arbitrary (m b), Arbitrary (m c)
+     , Show a, Show t, Show (m a)
+     , Arbitrary a, Arbitrary t, Arbitrary (m a), Arbitrary (m b), Arbitrary (m c)
      , CoArbitrary a, CoArbitrary b
      , Typeable m, Typeable a, Typeable b, Typeable c
      )
-  => Proxy m -> Proxy a -> Proxy b -> Proxy c
-  -> (forall u. (Eq u) => m u -> m u -> Bool) -- ^ Equality test
+  => Proxy m -> Proxy t -> Proxy a -> Proxy b -> Proxy c
+  -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
   -> TestTree
-testMonadLaws pm pa pb pc eq =
+testMonadLaws pm pt pa pb pc eq =
   let
     label = "Monad Laws for " ++ (show $ typeRep pm) ++ " with " ++
       "a :: " ++ (show $ typeRep pa) ++ ", " ++
@@ -49,9 +49,9 @@ testMonadLaws pm pa pb pc eq =
       "c :: " ++ (show $ typeRep pc)
   in
     testGroup label
-      [ testMonadLawRightIdentity pm pa eq
-      , testMonadLawLeftIdentity pm pa pb eq
-      , testMonadLawAssociativity pm pa pb pc eq
+      [ testMonadLawRightIdentity pm pt pa eq
+      , testMonadLawLeftIdentity pm pt pa pb eq
+      , testMonadLawAssociativity pm pt pa pb pc eq
       ]
 
 
@@ -60,23 +60,25 @@ testMonadLaws pm pa pb pc eq =
 testMonadLawRightIdentity
   :: ( Monad m
      , Eq a
+     , Show t
      , Show (m a)
+     , Arbitrary t
      , Arbitrary (m a)
      )
-  => Proxy m -> Proxy a
-  -> (forall u. (Eq u) => m u -> m u -> Bool) -- ^ Equality test
+  => Proxy m -> Proxy t -> Proxy a
+  -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
   -> TestTree
-testMonadLawRightIdentity pm pa eq =
+testMonadLawRightIdentity pm pt pa eq =
   testProperty "x >>= return === x" $
-    monadLawRightIdentity pm pa eq
+    monadLawRightIdentity pm pt pa eq
 
 monadLawRightIdentity
   :: (Monad m, Eq a)
-  => Proxy m -> Proxy a
-  -> (forall u. (Eq u) => m u -> m u -> Bool)
-  -> m a -> Bool
-monadLawRightIdentity _ _ eq x =
-  eq (x >>= return) (x)
+  => Proxy m -> Proxy t -> Proxy a
+  -> (forall u. (Eq u) => t -> m u -> m u -> Bool)
+  -> t -> m a -> Bool
+monadLawRightIdentity _ _ _ eq t x =
+  (eq t) (x >>= return) (x)
 
 
 
@@ -84,24 +86,24 @@ monadLawRightIdentity _ _ eq x =
 testMonadLawLeftIdentity
   :: ( Monad m
      , Eq b
-     , Show a
-     , Arbitrary a, Arbitrary (m b)
+     , Show a, Show t
+     , Arbitrary a, Arbitrary t, Arbitrary (m b)
      , CoArbitrary a
      )
-  => Proxy m -> Proxy a -> Proxy b
-  -> (forall u. (Eq u) => m u -> m u -> Bool) -- ^ Equality test
+  => Proxy m -> Proxy t -> Proxy a -> Proxy b
+  -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
   -> TestTree
-testMonadLawLeftIdentity pm pa pb eq =
+testMonadLawLeftIdentity pm pt pa pb eq =
   testProperty "return a >>= f === f a" $
-    monadLawLeftIdentity pm pa pb eq
+    monadLawLeftIdentity pm pt pa pb eq
 
 monadLawLeftIdentity
   :: (Monad m, Eq b)
-  => Proxy m -> Proxy a -> Proxy b
-  -> (forall u. (Eq u) => m u -> m u -> Bool)
-  -> a -> (a -> m b) -> Bool
-monadLawLeftIdentity _ _ _ eq x f =
-  eq ((return x) >>= f) (f x)
+  => Proxy m -> Proxy t -> Proxy a -> Proxy b
+  -> (forall u. (Eq u) => t -> m u -> m u -> Bool)
+  -> t -> a -> (a -> m b) -> Bool
+monadLawLeftIdentity _ _ _ _ eq t x f =
+  (eq t) ((return x) >>= f) (f x)
 
 
 
@@ -109,26 +111,26 @@ monadLawLeftIdentity _ _ _ eq x f =
 testMonadLawAssociativity
   :: ( Monad m
      , Eq c
-     , Show (m a)
-     , Arbitrary (m a), Arbitrary (m b), Arbitrary (m c)
+     , Show t, Show (m a)
+     , Arbitrary t, Arbitrary (m a), Arbitrary (m b), Arbitrary (m c)
      , CoArbitrary a, CoArbitrary b
      )
-  => Proxy m -> Proxy a -> Proxy b -> Proxy c
-  -> (forall u. (Eq u) => m u -> m u -> Bool) -- ^ Equality test
+  => Proxy m -> Proxy t -> Proxy a -> Proxy b -> Proxy c
+  -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
   -> TestTree
-testMonadLawAssociativity pm pa pb pc eq =
+testMonadLawAssociativity pm pt pa pb pc eq =
   testProperty "(x >>= f) >>= g === x >>= (\\z -> f z >>= g)" $
-    monadLawAssociativity pm pa pb pc eq
+    monadLawAssociativity pm pt pa pb pc eq
 
 monadLawAssociativity
   :: ( Monad m
      , Eq c
      )
-  => Proxy m -> Proxy a -> Proxy b -> Proxy c
-  -> (forall u. (Eq u) => m u -> m u -> Bool)
-  -> m a -> (a -> m b) -> (b -> m c) -> Bool
-monadLawAssociativity _ _ _ _ eq x f g =
-  eq ((x >>= f) >>= g) (x >>= (\z -> f z >>= g))
+  => Proxy m -> Proxy t -> Proxy a -> Proxy b -> Proxy c
+  -> (forall u. (Eq u) => t -> m u -> m u -> Bool)
+  -> t -> m a -> (a -> m b) -> (b -> m c) -> Bool
+monadLawAssociativity _ _ _ _ _ eq t x f g =
+  (eq t) ((x >>= f) >>= g) (x >>= (\z -> f z >>= g))
 
 
 
@@ -138,17 +140,17 @@ monadLawAssociativity _ _ _ _ eq x f g =
 testMonadLaws1
   :: ( Monad m
      , Checkable a
-     , Show (m a)
-     , Arbitrary (m a)
+     , Show t, Show (m a)
+     , Arbitrary t, Arbitrary (m a)
      , Typeable m
      )
-  => Proxy m -> Proxy a
-  -> (forall u. (Eq u) => m u -> m u -> Bool) -- ^ Equality test
+  => Proxy m -> Proxy t -> Proxy a
+  -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
   -> TestTree
-testMonadLaws1 pm pa eq =
+testMonadLaws1 pm pt pa eq =
   let label = "Monad Laws for " ++ (show $ typeRep pm) in
   testGroup label
-    [ testMonadLaws pm pa pa pa eq
+    [ testMonadLaws pm pt pa pa pa eq
     ]
 
 
@@ -157,24 +159,24 @@ testMonadLaws1 pm pa eq =
 testMonadLaws2
   :: ( Monad m
      , Checkable a, Checkable b
-     , Show (m a), Show (m b)
-     , Arbitrary (m a), Arbitrary (m b)
+     , Show t, Show (m a), Show (m b)
+     , Arbitrary t, Arbitrary (m a), Arbitrary (m b)
      , Typeable m
      )
-  => Proxy m -> Proxy a -> Proxy b
-  -> (forall u. (Eq u) => m u -> m u -> Bool) -- ^ Equality test
+  => Proxy m -> Proxy t -> Proxy a -> Proxy b
+  -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
   -> TestTree
-testMonadLaws2 pm pa pb eq =
+testMonadLaws2 pm pt pa pb eq =
   let label = "Monad Laws for " ++ (show $ typeRep pm) in
   testGroup label
-    [ testMonadLaws pm pa pa pa eq
-    , testMonadLaws pm pa pa pb eq
-    , testMonadLaws pm pa pb pa eq
-    , testMonadLaws pm pa pb pb eq
-    , testMonadLaws pm pb pa pa eq
-    , testMonadLaws pm pb pa pb eq
-    , testMonadLaws pm pb pb pa eq
-    , testMonadLaws pm pb pb pb eq
+    [ testMonadLaws pm pt pa pa pa eq
+    , testMonadLaws pm pt pa pa pb eq
+    , testMonadLaws pm pt pa pb pa eq
+    , testMonadLaws pm pt pa pb pb eq
+    , testMonadLaws pm pt pb pa pa eq
+    , testMonadLaws pm pt pb pa pb eq
+    , testMonadLaws pm pt pb pb pa eq
+    , testMonadLaws pm pt pb pb pb eq
     ]
 
 
@@ -183,41 +185,41 @@ testMonadLaws2 pm pa pb eq =
 testMonadLaws3
   :: ( Monad m
      , Checkable a, Checkable b, Checkable c
-     , Show (m a), Show (m b), Show (m c)
-     , Arbitrary (m a), Arbitrary (m b), Arbitrary (m c)
+     , Show t, Show (m a), Show (m b), Show (m c)
+     , Arbitrary t, Arbitrary (m a), Arbitrary (m b), Arbitrary (m c)
      , Typeable m
      )
-  => Proxy m -> Proxy a -> Proxy b -> Proxy c
-  -> (forall u. (Eq u) => m u -> m u -> Bool) -- ^ Equality test
+  => Proxy m -> Proxy t -> Proxy a -> Proxy b -> Proxy c
+  -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
   -> TestTree
-testMonadLaws3 pm pa pb pc eq =
+testMonadLaws3 pm pt pa pb pc eq =
   let label = "Monad Laws for " ++ (show $ typeRep pm) in
   testGroup label
-    [ testMonadLaws pm pa pa pa eq
-    , testMonadLaws pm pa pa pb eq
-    , testMonadLaws pm pa pa pc eq
-    , testMonadLaws pm pa pb pa eq
-    , testMonadLaws pm pa pb pb eq
-    , testMonadLaws pm pa pb pc eq
-    , testMonadLaws pm pa pc pa eq
-    , testMonadLaws pm pa pc pb eq
-    , testMonadLaws pm pa pc pc eq
-    , testMonadLaws pm pb pa pa eq
-    , testMonadLaws pm pb pa pb eq
-    , testMonadLaws pm pb pa pc eq
-    , testMonadLaws pm pb pb pa eq
-    , testMonadLaws pm pb pb pb eq
-    , testMonadLaws pm pb pb pc eq
-    , testMonadLaws pm pb pc pa eq
-    , testMonadLaws pm pb pc pb eq
-    , testMonadLaws pm pb pc pc eq
-    , testMonadLaws pm pc pa pa eq
-    , testMonadLaws pm pc pa pb eq
-    , testMonadLaws pm pc pa pc eq
-    , testMonadLaws pm pc pb pa eq
-    , testMonadLaws pm pc pb pb eq
-    , testMonadLaws pm pc pb pc eq
-    , testMonadLaws pm pc pc pa eq
-    , testMonadLaws pm pc pc pb eq
-    , testMonadLaws pm pc pc pc eq
+    [ testMonadLaws pm pt pa pa pa eq
+    , testMonadLaws pm pt pa pa pb eq
+    , testMonadLaws pm pt pa pa pc eq
+    , testMonadLaws pm pt pa pb pa eq
+    , testMonadLaws pm pt pa pb pb eq
+    , testMonadLaws pm pt pa pb pc eq
+    , testMonadLaws pm pt pa pc pa eq
+    , testMonadLaws pm pt pa pc pb eq
+    , testMonadLaws pm pt pa pc pc eq
+    , testMonadLaws pm pt pb pa pa eq
+    , testMonadLaws pm pt pb pa pb eq
+    , testMonadLaws pm pt pb pa pc eq
+    , testMonadLaws pm pt pb pb pa eq
+    , testMonadLaws pm pt pb pb pb eq
+    , testMonadLaws pm pt pb pb pc eq
+    , testMonadLaws pm pt pb pc pa eq
+    , testMonadLaws pm pt pb pc pb eq
+    , testMonadLaws pm pt pb pc pc eq
+    , testMonadLaws pm pt pc pa pa eq
+    , testMonadLaws pm pt pc pa pb eq
+    , testMonadLaws pm pt pc pa pc eq
+    , testMonadLaws pm pt pc pb pa eq
+    , testMonadLaws pm pt pc pb pb eq
+    , testMonadLaws pm pt pc pb pc eq
+    , testMonadLaws pm pt pc pc pa eq
+    , testMonadLaws pm pt pc pc pb eq
+    , testMonadLaws pm pt pc pc pc eq
     ]

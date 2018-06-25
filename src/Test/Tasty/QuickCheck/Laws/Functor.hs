@@ -30,16 +30,16 @@ import Test.Tasty.QuickCheck.Laws.Class
 testFunctorLaws
   :: ( Functor f
      , Eq a, Eq c
-     , Show (f a)
-     , Arbitrary b, Arbitrary c
+     , Show t, Show (f a)
+     , Arbitrary t, Arbitrary b, Arbitrary c
      , Arbitrary (f a)
      , CoArbitrary a, CoArbitrary b
      , Typeable f, Typeable a, Typeable b, Typeable c
      )
-  => Proxy f -> Proxy a -> Proxy b -> Proxy c
-  -> (forall u. (Eq u) => f u -> f u -> Bool) -- ^ Equality test
+  => Proxy f -> Proxy t -> Proxy a -> Proxy b -> Proxy c
+  -> (forall u. (Eq u) => t -> f u -> f u -> Bool) -- ^ Equality test
   -> TestTree
-testFunctorLaws pf pa pb pc eq =
+testFunctorLaws pf pt pa pb pc eq =
   let
     label = "Functor Laws for " ++ (show $ typeRep pf) ++ " with " ++
       "a :: " ++ (show $ typeRep pa) ++ ", " ++
@@ -47,8 +47,8 @@ testFunctorLaws pf pa pb pc eq =
       "c :: " ++ (show $ typeRep pc)
   in
     testGroup label
-      [ testFunctorLawIdentity pf pa eq
-      , testFunctorLawComposite pf pa pb pc eq
+      [ testFunctorLawIdentity pf pt pa eq
+      , testFunctorLawComposite pf pt pa pb pc eq
       ]
 
 
@@ -57,23 +57,23 @@ testFunctorLaws pf pa pb pc eq =
 testFunctorLawIdentity
   :: ( Functor f
      , Eq a
-     , Show (f a)
-     , Arbitrary (f a)
+     , Show t, Show (f a)
+     , Arbitrary t, Arbitrary (f a)
      )
-  => Proxy f -> Proxy a
-  -> (forall u. (Eq u) => f u -> f u -> Bool) -- ^ Equality test
+  => Proxy f -> Proxy t -> Proxy a
+  -> (forall u. (Eq u) => t -> f u -> f u -> Bool) -- ^ Equality test
   -> TestTree
-testFunctorLawIdentity pf pa eq =
+testFunctorLawIdentity pf pt pa eq =
   testProperty "fmap id x === x" $
-    functorLawIdentity pf pa eq
+    functorLawIdentity pf pt pa eq
 
 functorLawIdentity
   :: (Functor f, Eq a)
-  => Proxy f -> Proxy a
-  -> (forall u. (Eq u) => f u -> f u -> Bool) -- ^ Equality test
-  -> f a -> Bool
-functorLawIdentity _ _ eq x =
-  eq (fmap id x) x
+  => Proxy f -> Proxy t -> Proxy a
+  -> (forall u. (Eq u) => t -> f u -> f u -> Bool) -- ^ Equality test
+  -> t -> f a -> Bool
+functorLawIdentity _ _ _ eq t x =
+  (eq t) (fmap id x) x
 
 
 
@@ -81,25 +81,25 @@ functorLawIdentity _ _ eq x =
 testFunctorLawComposite
   :: ( Functor f
      , Eq c
-     , Show (f a)
-     , Arbitrary b, Arbitrary c
+     , Show t, Show (f a)
+     , Arbitrary t, Arbitrary b, Arbitrary c
      , Arbitrary (f a)
      , CoArbitrary a, CoArbitrary b
      )
-  => Proxy f -> Proxy a -> Proxy b -> Proxy c
-  -> (forall u. (Eq u) => f u -> f u -> Bool) -- ^ Equality test
+  => Proxy f -> Proxy t -> Proxy a -> Proxy b -> Proxy c
+  -> (forall u. (Eq u) => t -> f u -> f u -> Bool) -- ^ Equality test
   -> TestTree
-testFunctorLawComposite pf pa pb pc eq =
+testFunctorLawComposite pf pt pa pb pc eq =
   testProperty "fmap (f . g) x === (fmap f . fmap g) x" $
-    functorLawComposite pf pa pb pc eq
+    functorLawComposite pf pt pa pb pc eq
 
 functorLawComposite
   :: (Functor f, Eq c)
-  => Proxy f -> Proxy a -> Proxy b -> Proxy c
-  -> (forall u. (Eq u) => f u -> f u -> Bool)
-  -> (f a) -> (b -> c) -> (a -> b) -> Bool
-functorLawComposite _ _ _ _ eq x f g =
-  eq (fmap (f . g) x) ((fmap f . fmap g) x)
+  => Proxy f -> Proxy t -> Proxy a -> Proxy b -> Proxy c
+  -> (forall u. (Eq u) => t -> f u -> f u -> Bool)
+  -> t -> (f a) -> (b -> c) -> (a -> b) -> Bool
+functorLawComposite _ _ _ _ _ eq t x f g =
+  (eq t) (fmap (f . g) x) ((fmap f . fmap g) x)
 
 
 
@@ -109,17 +109,17 @@ functorLawComposite _ _ _ _ eq x f g =
 testFunctorLaws1
   :: ( Functor f
      , Checkable a
-     , Show (f a)
-     , Arbitrary (f a)
+     , Show t, Show (f a)
+     , Arbitrary t, Arbitrary (f a)
      , Typeable f
      )
-  => Proxy f -> Proxy a
-  -> (forall u. (Eq u) => f u -> f u -> Bool) -- ^ Equality test
+  => Proxy f -> Proxy t -> Proxy a
+  -> (forall u. (Eq u) => t -> f u -> f u -> Bool) -- ^ Equality test
   -> TestTree
-testFunctorLaws1 pf pa eq =
+testFunctorLaws1 pf pt pa eq =
   let label = "Functor Laws for " ++ (show $ typeRep pf) in
   testGroup label
-    [ testFunctorLaws pf pa pa pa eq
+    [ testFunctorLaws pf pt pa pa pa eq
     ]
 
 
@@ -128,24 +128,24 @@ testFunctorLaws1 pf pa eq =
 testFunctorLaws2
   :: ( Functor f
      , Checkable a, Checkable b
-     , Show (f a), Show (f b)
-     , Arbitrary (f a), Arbitrary (f b)
+     , Show t, Show (f a), Show (f b)
+     , Arbitrary t, Arbitrary (f a), Arbitrary (f b)
      , Typeable f
      )
-  => Proxy f -> Proxy a -> Proxy b
-  -> (forall u. (Eq u) => f u -> f u -> Bool) -- ^ Equality test
+  => Proxy f -> Proxy t -> Proxy a -> Proxy b
+  -> (forall u. (Eq u) => t -> f u -> f u -> Bool) -- ^ Equality test
   -> TestTree
-testFunctorLaws2 pf pa pb eq =
+testFunctorLaws2 pf pt pa pb eq =
   let label = "Functor Laws for " ++ (show $ typeRep pf) in
   testGroup label
-    [ testFunctorLaws pf pa pa pa eq
-    , testFunctorLaws pf pa pa pb eq
-    , testFunctorLaws pf pa pb pa eq
-    , testFunctorLaws pf pa pb pb eq
-    , testFunctorLaws pf pb pa pa eq
-    , testFunctorLaws pf pb pa pb eq
-    , testFunctorLaws pf pb pb pa eq
-    , testFunctorLaws pf pb pb pb eq
+    [ testFunctorLaws pf pt pa pa pa eq
+    , testFunctorLaws pf pt pa pa pb eq
+    , testFunctorLaws pf pt pa pb pa eq
+    , testFunctorLaws pf pt pa pb pb eq
+    , testFunctorLaws pf pt pb pa pa eq
+    , testFunctorLaws pf pt pb pa pb eq
+    , testFunctorLaws pf pt pb pb pa eq
+    , testFunctorLaws pf pt pb pb pb eq
     ]
 
 
@@ -154,41 +154,41 @@ testFunctorLaws2 pf pa pb eq =
 testFunctorLaws3
   :: ( Functor f
      , Checkable a, Checkable b, Checkable c
-     , Show (f a), Show (f b), Show (f c)
-     , Arbitrary (f a), Arbitrary (f b), Arbitrary (f c)
+     , Show t, Show (f a), Show (f b), Show (f c)
+     , Arbitrary t, Arbitrary (f a), Arbitrary (f b), Arbitrary (f c)
      , Typeable f
      )
-  => Proxy f -> Proxy a -> Proxy b -> Proxy c
-  -> (forall u. (Eq u) => f u -> f u -> Bool) -- ^ Equality test
+  => Proxy f -> Proxy t -> Proxy a -> Proxy b -> Proxy c
+  -> (forall u. (Eq u) => t -> f u -> f u -> Bool) -- ^ Equality test
   -> TestTree
-testFunctorLaws3 pf pa pb pc eq =
+testFunctorLaws3 pf pt pa pb pc eq =
   let label = "Functor Laws for " ++ (show $ typeRep pf) in
   testGroup label
-    [ testFunctorLaws pf pa pa pa eq
-    , testFunctorLaws pf pa pa pb eq
-    , testFunctorLaws pf pa pa pc eq
-    , testFunctorLaws pf pa pb pa eq
-    , testFunctorLaws pf pa pb pb eq
-    , testFunctorLaws pf pa pb pc eq
-    , testFunctorLaws pf pa pc pa eq
-    , testFunctorLaws pf pa pc pb eq
-    , testFunctorLaws pf pa pc pc eq
-    , testFunctorLaws pf pb pa pa eq
-    , testFunctorLaws pf pb pa pb eq
-    , testFunctorLaws pf pb pa pc eq
-    , testFunctorLaws pf pb pb pa eq
-    , testFunctorLaws pf pb pb pb eq
-    , testFunctorLaws pf pb pb pc eq
-    , testFunctorLaws pf pb pc pa eq
-    , testFunctorLaws pf pb pc pb eq
-    , testFunctorLaws pf pb pc pc eq
-    , testFunctorLaws pf pc pa pa eq
-    , testFunctorLaws pf pc pa pb eq
-    , testFunctorLaws pf pc pa pc eq
-    , testFunctorLaws pf pc pb pa eq
-    , testFunctorLaws pf pc pb pb eq
-    , testFunctorLaws pf pc pb pc eq
-    , testFunctorLaws pf pc pc pa eq
-    , testFunctorLaws pf pc pc pb eq
-    , testFunctorLaws pf pc pc pc eq
+    [ testFunctorLaws pf pt pa pa pa eq
+    , testFunctorLaws pf pt pa pa pb eq
+    , testFunctorLaws pf pt pa pa pc eq
+    , testFunctorLaws pf pt pa pb pa eq
+    , testFunctorLaws pf pt pa pb pb eq
+    , testFunctorLaws pf pt pa pb pc eq
+    , testFunctorLaws pf pt pa pc pa eq
+    , testFunctorLaws pf pt pa pc pb eq
+    , testFunctorLaws pf pt pa pc pc eq
+    , testFunctorLaws pf pt pb pa pa eq
+    , testFunctorLaws pf pt pb pa pb eq
+    , testFunctorLaws pf pt pb pa pc eq
+    , testFunctorLaws pf pt pb pb pa eq
+    , testFunctorLaws pf pt pb pb pb eq
+    , testFunctorLaws pf pt pb pb pc eq
+    , testFunctorLaws pf pt pb pc pa eq
+    , testFunctorLaws pf pt pb pc pb eq
+    , testFunctorLaws pf pt pb pc pc eq
+    , testFunctorLaws pf pt pc pa pa eq
+    , testFunctorLaws pf pt pc pa pb eq
+    , testFunctorLaws pf pt pc pa pc eq
+    , testFunctorLaws pf pt pc pb pa eq
+    , testFunctorLaws pf pt pc pb pb eq
+    , testFunctorLaws pf pt pc pb pc eq
+    , testFunctorLaws pf pt pc pc pa eq
+    , testFunctorLaws pf pt pc pc pb eq
+    , testFunctorLaws pf pt pc pc pc eq
     ]

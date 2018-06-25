@@ -11,17 +11,19 @@ main :: IO ()
 main = defaultMain $
   testGroup "Laws"
     [ testGroup "Functor Laws"
-      [ testFunctorLaws3 pMb pU pB pI (==)
-      , testFunctorLaws3 pEi pU pB pI (==)
-      , testFunctorLaws3 pLs pU pB pI (==)
+      [ testFunctorLaws3 pMb pU pU pB pI (const (==))
+      , testFunctorLaws3 pEi pU pU pB pI (const (==))
+      , testFunctorLaws3 pLs pU pU pB pI (const (==))
       ]
     , testGroup "Applicative Laws"
-      [ testApplicativeLaws3 pMb pU pB pI (==)
+      [ testApplicativeLaws3 pMb pU pU pB pI (const (==))
+      , testApplicativeLaws3 pEi pU pU pB pI (const (==))
+      , testApplicativeLaws3 pLs pU pU pB pI (const (==))
       ]
     , testGroup "Monad Laws"
-      [ testMonadLaws3 pMb pU pB pI (==)
-      , testMonadLaws3 pEi pU pB pI (==)
-      , testMonadLaws3 pLs pU pB pI (==)
+      [ testMonadLaws3 pMb pU pU pB pI (const (==))
+      , testMonadLaws3 pEi pU pU pB pI (const (==))
+      , testMonadLaws3 pLs pU pU pB pI (const (==))
       ]
     ]
 
