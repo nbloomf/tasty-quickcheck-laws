@@ -3,8 +3,8 @@ module Main where
 import Test.Tasty
 import Data.Proxy
 
-import Test.Tasty.QuickCheck.Laws.Functor
-import Test.Tasty.QuickCheck.Laws.Monad
+import Test.Tasty.QuickCheck.Laws
+
 
 
 main :: IO ()
@@ -12,6 +12,11 @@ main = defaultMain $
   testGroup "Laws"
     [ testGroup "Functor Laws"
       [ testFunctorLaws3 pMb pU pB pI (==)
+      , testFunctorLaws3 pEi pU pB pI (==)
+      , testFunctorLaws3 pLs pU pB pI (==)
+      ]
+    , testGroup "Applicative Laws"
+      [ testApplicativeLaws3 pMb pU pB pI (==)
       ]
     , testGroup "Monad Laws"
       [ testMonadLaws3 pMb pU pB pI (==)

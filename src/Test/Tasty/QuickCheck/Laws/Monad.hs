@@ -49,9 +49,9 @@ testMonadLaws pm pa pb pc eq =
       "c :: " ++ (show $ typeRep pc)
   in
     testGroup label
-      [  testMonadLawRightIdentity pm pa eq
-      ,  testMonadLawLeftIdentity pm pa pb eq
-      ,  testMonadLawAssociativity pm pa pb pc eq
+      [ testMonadLawRightIdentity pm pa eq
+      , testMonadLawLeftIdentity pm pa pb eq
+      , testMonadLawAssociativity pm pa pb pc eq
       ]
 
 
