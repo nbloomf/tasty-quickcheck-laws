@@ -12,3 +12,4 @@ Currently includes laws for the following type classes:
 * Applicative
 * Monad
 * Eq
+* Monoid

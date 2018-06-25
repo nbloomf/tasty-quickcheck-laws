@@ -40,6 +40,7 @@ library
     Test.Tasty.QuickCheck.Laws.Eq
     Test.Tasty.QuickCheck.Laws.Functor
     Test.Tasty.QuickCheck.Laws.Monad
+    Test.Tasty.QuickCheck.Laws.Monoid
 
 
 

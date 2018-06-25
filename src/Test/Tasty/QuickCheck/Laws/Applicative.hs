@@ -175,7 +175,7 @@ testApplicativeLaws1
   -> (forall u. (Eq u) => t -> f u -> f u -> Bool) -- ^ Equality test
   -> TestTree
 testApplicativeLaws1 pf pt pa eq =
-  let label = "Functor Laws for " ++ (show $ typeRep pf) in
+  let label = "Applicative Laws for " ++ (show $ typeRep pf) in
   testGroup label
     [ testApplicativeLaws pf pt pa pa pa eq
     ]
@@ -198,7 +198,7 @@ testApplicativeLaws2
   -> (forall u. (Eq u) => t -> f u -> f u -> Bool) -- ^ Equality test
   -> TestTree
 testApplicativeLaws2 pf pt pa pb eq =
-  let label = "Functor Laws for " ++ (show $ typeRep pf) in
+  let label = "Applicative Laws for " ++ (show $ typeRep pf) in
   testGroup label
     [ testApplicativeLaws pf pt pa pa pa eq
     , testApplicativeLaws pf pt pa pa pb eq
@@ -230,7 +230,7 @@ testApplicativeLaws3
   -> (forall u. (Eq u) => t -> f u -> f u -> Bool) -- ^ Equality test
   -> TestTree
 testApplicativeLaws3 pf pt pa pb pc eq =
-  let label = "Functor Laws for " ++ (show $ typeRep pf) in
+  let label = "Applicative Laws for " ++ (show $ typeRep pf) in
   testGroup label
     [ testApplicativeLaws pf pt pa pa pa eq
     , testApplicativeLaws pf pt pa pa pb eq

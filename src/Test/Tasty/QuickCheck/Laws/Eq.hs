@@ -14,9 +14,7 @@ import Data.Typeable
 import Test.Tasty
   ( TestTree, testGroup )
 import Test.Tasty.QuickCheck
-  ( testProperty, Property, Arbitrary(..), CoArbitrary(..) )
-import Text.Show.Functions
-  ()
+  ( testProperty, Property, Arbitrary(..) )
 
 import Test.Tasty.QuickCheck.Laws.Class
 

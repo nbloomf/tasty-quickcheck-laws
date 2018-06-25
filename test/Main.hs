@@ -17,6 +17,11 @@ main = do
       , testEqLaws pB
       , testEqLaws pI
       ]
+    , testGroup "Monoid Laws"
+      [ testMonoidLaws (Proxy :: Proxy [()])
+      , testMonoidLaws (Proxy :: Proxy [Bool])
+      , testMonoidLaws (Proxy :: Proxy (Maybe [()]))
+      ]
     , testGroup "Functor Laws"
       [ testFunctorLaws3 pMb pU pU pB pI (const (==))
       , testFunctorLaws3 pEi pU pU pB pI (const (==))
