@@ -28,6 +28,7 @@ main = defaultMain $
     ]
 
 
+
 pMb = Proxy :: Proxy Maybe
 pEi = Proxy :: Proxy (Either Int)
 pLs = Proxy :: Proxy []
