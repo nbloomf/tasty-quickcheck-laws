@@ -5,6 +5,7 @@ module Test.Tasty.QuickCheck.Laws (
   , module Test.Tasty.QuickCheck.Laws.Functor
   , module Test.Tasty.QuickCheck.Laws.Monad
   , module Test.Tasty.QuickCheck.Laws.Monoid
+  , module Test.Tasty.QuickCheck.Laws.ReaderMonad
   , module Test.Tasty.QuickCheck.Laws.StateMonad
 ) where
 
@@ -14,4 +15,5 @@ import Test.Tasty.QuickCheck.Laws.Eq
 import Test.Tasty.QuickCheck.Laws.Functor
 import Test.Tasty.QuickCheck.Laws.Monad
 import Test.Tasty.QuickCheck.Laws.Monoid
+import Test.Tasty.QuickCheck.Laws.ReaderMonad
 import Test.Tasty.QuickCheck.Laws.StateMonad

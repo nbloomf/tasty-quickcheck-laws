@@ -51,7 +51,8 @@ testStateMonadLaws
      )
   => Proxy m -> Proxy t -> Proxy s -> Proxy a
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> m s -> (s -> m ())
+  -> m s -- ^ get
+  -> (s -> m ()) -- ^ put
   -> TestTree
 testStateMonadLaws pm pt ps pa eq get put =
   let
@@ -76,7 +77,7 @@ testStateMonadLawPutPut
      )
   => Proxy m -> Proxy t -> Proxy s
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> (s -> m ())
+  -> (s -> m ()) -- ^ put
   -> TestTree
 testStateMonadLawPutPut pm pt ps eq put =
   testProperty "put s1 >> put s2 === put s2" $
@@ -86,7 +87,7 @@ stateMonadLawPutPut
   :: (Monad m)
   => Proxy m -> Proxy t -> Proxy s
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool)
-  -> (s -> m ())
+  -> (s -> m ()) -- ^ put
   -> t -> s -> s -> Bool
 stateMonadLawPutPut _ _ _ eq put t s1 s2 =
   (eq t) (put s1 >> put s2) (put s2)
@@ -102,7 +103,8 @@ testStateMonadLawPutGet
      )
   => Proxy m -> Proxy t -> Proxy s
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> m s -> (s -> m ())
+  -> m s -- ^ get
+  -> (s -> m ()) -- ^ put
   -> TestTree
 testStateMonadLawPutGet pm pt ps eq get put =
   testProperty "put s >> get === put s >> return s" $
@@ -127,7 +129,8 @@ testStateMonadLawGetPut
      )
   => Proxy m -> Proxy t -> Proxy s
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> m s -> (s -> m ())
+  -> m s -- ^ get
+  -> (s -> m ()) -- ^ put
   -> TestTree
 testStateMonadLawGetPut pm pt ps eq get put =
   testProperty "get >>= put === return ()" $
@@ -155,7 +158,7 @@ testStateMonadLawGetGet
      )
   => Proxy m -> Proxy t -> Proxy s -> Proxy a
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> m s
+  -> m s -- ^ get
   -> TestTree
 testStateMonadLawGetGet pm pt ps pa eq get =
   testProperty "get >>= \\s -> get >>= k s === get >>= \\s -> k s s" $

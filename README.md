@@ -11,9 +11,10 @@ This module provides some prefab test trees using QuickCheck to test various law
 
 Currently includes laws for the following type classes:
 
-* Applicative
 * Eq
-* Functor
-* Monad
 * Monoid
+* Functor
+* Applicative
+* Monad
 * State Monad
+* Reader Monad
