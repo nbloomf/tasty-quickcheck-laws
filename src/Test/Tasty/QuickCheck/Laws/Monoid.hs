@@ -1,3 +1,15 @@
+{- |
+Module      : Test.Tasty.QuickCheck.Laws.Monoid
+Description : Prefab tasty trees of quickcheck properties for the Monoid laws
+Copyright   : 2018, Automattic, Inc.
+License     : GPL-3
+Maintainer  : Nathan Bloomfield (nbloomf@gmail.com)
+Stability   : experimental
+Portability : POSIX
+-}
+
+
+
 module Test.Tasty.QuickCheck.Laws.Monoid (
     testMonoidLaws
 

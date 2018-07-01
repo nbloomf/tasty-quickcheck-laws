@@ -41,6 +41,7 @@ library
     Test.Tasty.QuickCheck.Laws.Functor
     Test.Tasty.QuickCheck.Laws.Monad
     Test.Tasty.QuickCheck.Laws.Monoid
+    Test.Tasty.QuickCheck.Laws.StateMonad
 
 
 
@@ -65,5 +66,6 @@ test-suite tasty-quickcheck-laws-test
 
   build-depends:
       base >=4.7 && <5
+    , QuickCheck >=2.10.1 && <2.11
     , tasty-quickcheck-laws
     , tasty >=1.0.1.1 && <1.1
