@@ -38,6 +38,7 @@ library
     Test.Tasty.QuickCheck.Laws.Applicative
     Test.Tasty.QuickCheck.Laws.Class
     Test.Tasty.QuickCheck.Laws.Eq
+    Test.Tasty.QuickCheck.Laws.ErrorMonad
     Test.Tasty.QuickCheck.Laws.Functor
     Test.Tasty.QuickCheck.Laws.Monad
     Test.Tasty.QuickCheck.Laws.Monoid

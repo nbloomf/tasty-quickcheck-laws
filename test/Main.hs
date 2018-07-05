@@ -41,13 +41,18 @@ main = do
       ]
     , testGroup "State Monad Laws"
       [ testStateMonadLaws pSU pU pU pU stateEq get put
-      , testStateMonadLaws pSI pI pI pI stateEq get put
       , testStateMonadLaws pSB pB pB pB stateEq get put
+      , testStateMonadLaws pSI pI pI pI stateEq get put
       ]
     , testGroup "Reader Monad Laws"
       [ testReaderMonadLaws pRU pU pU pU pU readerEq ask local
-      , testReaderMonadLaws pRI pI pI pI pI readerEq ask local
       , testReaderMonadLaws pRB pB pB pB pB readerEq ask local
+      , testReaderMonadLaws pRI pI pI pI pI readerEq ask local
+      ]
+    , testGroup "Error Monad Laws"
+      [ testErrorMonadLaws pEU pU pU pU (const (==)) throw catch
+      , testErrorMonadLaws pEB pU pB pU (const (==)) throw catch
+      , testErrorMonadLaws pEI pU pI pU (const (==)) throw catch
       ]
     ]
 
@@ -58,16 +63,20 @@ pEi = Proxy :: Proxy (Either Int)
 pLs = Proxy :: Proxy []
 
 pU = Proxy :: Proxy ()
-pI = Proxy :: Proxy Int
 pB = Proxy :: Proxy Bool
+pI = Proxy :: Proxy Int
 
 pSU = Proxy :: Proxy (State ())
-pSI = Proxy :: Proxy (State Int)
 pSB = Proxy :: Proxy (State Bool)
+pSI = Proxy :: Proxy (State Int)
 
 pRU = Proxy :: Proxy (Reader ())
-pRI = Proxy :: Proxy (Reader Int)
 pRB = Proxy :: Proxy (Reader Bool)
+pRI = Proxy :: Proxy (Reader Int)
+
+pEU = Proxy :: Proxy (Error ())
+pEB = Proxy :: Proxy (Error Bool)
+pEI = Proxy :: Proxy (Error Int)
 
 
 
@@ -141,3 +150,36 @@ ask = Reader $ \r -> r
 
 local :: (r -> r) -> Reader r a -> Reader r a
 local u x = Reader $ \r -> runReader x (u r)
+
+
+
+-- Basic Error Monad
+
+data Error e a = Error
+  { runError :: Either e a
+  } deriving (Eq, Show)
+
+instance Monad (Error e) where
+  return a = Error (Right a)
+
+  x >>= f = case x of
+    Error (Left e) -> Error (Left e)
+    Error (Right a) -> f a
+
+instance Applicative (Error e) where
+  pure = return
+  (<*>) = ap
+
+instance Functor (Error e) where
+  fmap f x = x >>= (return . f)
+
+instance (Arbitrary a, Arbitrary e) => Arbitrary (Error e a) where
+  arbitrary = Error <$> arbitrary
+
+throw :: e -> Error e a
+throw e = Error (Left e)
+
+catch :: Error e a -> (e -> Error e a) -> Error e a
+catch x h = case x of
+  Error (Right a) -> Error (Right a)
+  Error (Left e) -> h e
