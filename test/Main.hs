@@ -50,21 +50,21 @@ main = do
       , testReaderMonadLaws pRI pI pI pI pI readerEq ask local
       ]
     , testGroup "Error Monad Laws"
-      [ testErrorMonadLaws pEU pU pU pU (const (==)) throw catch
-      , testErrorMonadLaws pEB pU pB pU (const (==)) throw catch
-      , testErrorMonadLaws pEI pU pI pU (const (==)) throw catch
+      [ testErrorMonadLaws pEU pU pU pU pU (const (==)) throw catch
+      , testErrorMonadLaws pEB pU pB pU pU (const (==)) throw catch
+      , testErrorMonadLaws pEI pU pI pU pU (const (==)) throw catch
       ]
     ]
 
 
 
-pMb = Proxy :: Proxy Maybe
-pEi = Proxy :: Proxy (Either Int)
-pLs = Proxy :: Proxy []
-
 pU = Proxy :: Proxy ()
 pB = Proxy :: Proxy Bool
 pI = Proxy :: Proxy Int
+
+pMb = Proxy :: Proxy Maybe
+pEi = Proxy :: Proxy (Either Int)
+pLs = Proxy :: Proxy []
 
 pSU = Proxy :: Proxy (State ())
 pSB = Proxy :: Proxy (State Bool)
