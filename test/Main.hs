@@ -54,10 +54,17 @@ main = do
       , testErrorMonadLaws pEB pU pB pU pU (const (==)) throw catch
       , testErrorMonadLaws pEI pU pI pU pU (const (==)) throw catch
       ]
-    , testGroup "Writer Monad Laws"
-      [ testWriterMonadLaws pWU pU pU pU (const (==)) tell consume edit
-      , testWriterMonadLaws (pWLs pB) pU (pLs' pB) pU (const (==)) tell consume edit
-      , testWriterMonadLaws (pWLs pI) pU (pLs' pI) pU (const (==)) tell consume edit
+    , testGroup "Writer Monads"
+      [ testGroup "Writer Monad Laws"
+        [ testWriterMonadLaws pWU pU pU pU pU (const (==)) tell draft
+        , testWriterMonadLaws (pWLs pB) pU (pLs' pB) pU pU (const (==)) tell draft
+        , testWriterMonadLaws (pWLs pI) pU (pLs' pI) pU pU (const (==)) tell draft
+        ]
+      , testGroup "Writer Monad Equivalences"
+        [ testWriterMonadEquivalences pWU pU pU pU (const (==)) tell draft listen pass
+        , testWriterMonadEquivalences (pWLs pB) pU (pLs' pB) pU (const (==)) tell draft listen pass
+        , testWriterMonadEquivalences (pWLs pI) pU (pLs' pI) pU (const (==)) tell draft listen pass
+        ]
       ]
     ]
 
@@ -225,15 +232,19 @@ instance (Arbitrary w, Arbitrary a) => Arbitrary (Writer w a) where
 tell :: w -> Writer w ()
 tell w = Writer ((),w)
 
-consume :: (Monoid w) => Writer w a -> Writer w (a,w)
-consume x =
+draft :: (Monoid w) => Writer w a -> Writer w (a,w)
+draft x =
   let (a,w) = runWriter x
   in Writer ((a,w), mempty)
 
-edit :: Writer w (w -> w) -> Writer w a -> Writer w a
-edit u x =
+listen :: Writer w a -> Writer w (a,w)
+listen x =
+  let (a,w) = runWriter x
+  in Writer ((a,w), w)
+
+pass :: Writer w (a, w -> w) -> Writer w a
+pass x =
   let
-    (f,_) = runWriter u
-    (a,w) = runWriter x
+    ((a,f),w) = runWriter x
   in
     Writer (a, f w)
