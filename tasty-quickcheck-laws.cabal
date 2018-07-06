@@ -44,6 +44,7 @@ library
     Test.Tasty.QuickCheck.Laws.Monoid
     Test.Tasty.QuickCheck.Laws.ReaderMonad
     Test.Tasty.QuickCheck.Laws.StateMonad
+    Test.Tasty.QuickCheck.Laws.WriterMonad
 
 
 

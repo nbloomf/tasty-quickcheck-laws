@@ -8,6 +8,7 @@ module Test.Tasty.QuickCheck.Laws (
   , module Test.Tasty.QuickCheck.Laws.Monoid
   , module Test.Tasty.QuickCheck.Laws.ReaderMonad
   , module Test.Tasty.QuickCheck.Laws.StateMonad
+  , module Test.Tasty.QuickCheck.Laws.WriterMonad
 ) where
 
 import Test.Tasty.QuickCheck.Laws.Applicative
@@ -19,3 +20,4 @@ import Test.Tasty.QuickCheck.Laws.Monad
 import Test.Tasty.QuickCheck.Laws.Monoid
 import Test.Tasty.QuickCheck.Laws.ReaderMonad
 import Test.Tasty.QuickCheck.Laws.StateMonad
+import Test.Tasty.QuickCheck.Laws.WriterMonad

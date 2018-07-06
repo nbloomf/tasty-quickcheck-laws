@@ -45,7 +45,7 @@ testErrorMonadLaws
      , Arbitrary t, Arbitrary e, Arbitrary a
      , Arbitrary (m a), Arbitrary (m b)
      , CoArbitrary e, CoArbitrary a
-     , Typeable m, Typeable e, Typeable a
+     , Typeable m, Typeable e, Typeable a, Typeable b
      )
   => Proxy m -> Proxy t -> Proxy e -> Proxy a -> Proxy b
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
@@ -56,7 +56,8 @@ testErrorMonadLaws pm pt pe pa pb eq throw catch =
   let
     label = "Error Monad Laws for " ++ (show $ typeRep pm) ++ " with " ++
       "e :: " ++ (show $ typeRep pe) ++ ", " ++
-      "a :: " ++ (show $ typeRep pa)
+      "a :: " ++ (show $ typeRep pa) ++ ", " ++
+      "b :: " ++ (show $ typeRep pb)
   in
     testGroup label
       [ testErrorMonadLawCatchReturn pm pt pe pa eq catch
