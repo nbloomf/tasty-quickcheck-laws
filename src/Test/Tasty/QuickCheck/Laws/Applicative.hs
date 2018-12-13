@@ -6,6 +6,8 @@ License     : GPL-3
 Maintainer  : Nathan Bloomfield (nbloomf@gmail.com)
 Stability   : experimental
 Portability : POSIX
+
+Prebuilt tasty test trees for the @Applicative@ functor laws. To get started, look at @testApplicativeLaws@.
 -}
 
 
@@ -43,6 +45,7 @@ import Test.Tasty.QuickCheck.Laws.Class
 
 
 
+-- | Constructs a @TestTree@ checking that the four @Applicative@ class laws hold for @f@ with value types @a@, @b@, and @c@, using a given equality test for values of type @forall u. f u@. The equality context type @t@ is for constructors @f@ from which we can only extract a value within a context, such as reader-like constructors.
 testApplicativeLaws
   :: ( Applicative f
      , Eq a, Eq b, Eq c
@@ -53,7 +56,11 @@ testApplicativeLaws
      , CoArbitrary a
      , Typeable f, Typeable a, Typeable b, Typeable c
      )
-  => Proxy f -> Proxy t -> Proxy a -> Proxy b -> Proxy c
+  => Proxy f -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @f@
+  -> Proxy a -- ^ Value type
+  -> Proxy b -- ^ Value type
+  -> Proxy c -- ^ Value type
   -> (forall u. (Eq u) => t -> f u -> f u -> Bool) -- ^ Equality test
   -> TestTree
 testApplicativeLaws pf pt pa pb pc eq =
@@ -72,14 +79,16 @@ testApplicativeLaws pf pt pa pb pc eq =
 
 
 
--- | @pure id <*> x === x@
+-- | @pure id \<*> x === x@
 testApplicativeLawIdentity
   :: ( Applicative f
      , Eq a
      , Show (f a), Show t
      , Arbitrary (f a), Arbitrary t
      )
-  => Proxy f -> Proxy t -> Proxy a
+  => Proxy f -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @f@
+  -> Proxy a -- ^ Value type
   -> (forall u. (Eq u) => t -> f u -> f u -> Bool) -- ^ Equality test
   -> TestTree
 testApplicativeLawIdentity pf pt pa eq =
@@ -96,7 +105,7 @@ applicativeLawIdentity _ _ _ eq t x =
 
 
 
--- | @pure f <*> pure a === pure (f a)@
+-- | @pure f \<*> pure a === pure (f a)@
 testApplicativeLawHomomorphism
   :: ( Applicative f
      , Eq b
@@ -104,7 +113,10 @@ testApplicativeLawHomomorphism
      , Arbitrary a, Arbitrary b, Arbitrary t
      , CoArbitrary a
      )
-  => Proxy f -> Proxy t -> Proxy a -> Proxy b
+  => Proxy f -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @f@
+  -> Proxy a -- ^ Value type
+  -> Proxy b -- ^ Value type
   -> (forall u. (Eq u) => t -> f u -> f u -> Bool) -- ^ Equality test
   -> TestTree
 testApplicativeLawHomomorphism pf pt pa pb eq =
@@ -121,7 +133,7 @@ applicativeLawHomomorphism _ _ _ _ eq t f a =
 
 
 
--- | @x <*> pure a === pure ($ a) <*> x@
+-- | @x \<*> pure a === pure ($ a) \<*> x@
 testApplicativeLawInterchange
   :: ( Applicative f
      , Eq b
@@ -130,7 +142,10 @@ testApplicativeLawInterchange
      , Arbitrary a, Arbitrary t
      , Arbitrary (f (a -> b))
      )
-  => Proxy f -> Proxy t -> Proxy a -> Proxy b
+  => Proxy f -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @f@
+  -> Proxy a -- ^ Value type
+  -> Proxy b -- ^ Value type
   -> (forall u. (Eq u) => t -> f u -> f u -> Bool) -- ^ Equality test
   -> TestTree
 testApplicativeLawInterchange pf pt pa pb eq =
@@ -147,14 +162,18 @@ applicativeLawInterchange _ _ _ _ eq t x a =
 
 
 
--- | @pure (.) <*> x <*> y <*> z = x <*> (y <*> z)@
+-- | @pure (.) \<*> x \<*> y \<*> z = x \<*> (y \<*> z)@
 testApplicativeLawComposite
   :: ( Applicative f
      , Eq c
      , Show t, Show (f a), Show (f (b -> c)), Show (f (a -> b))
      , Arbitrary t, Arbitrary (f a), Arbitrary (f (b -> c)), Arbitrary (f (a -> b))
      )
-  => Proxy f -> Proxy t -> Proxy a -> Proxy b -> Proxy c
+  => Proxy f -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @f@
+  -> Proxy a -- ^ Value type
+  -> Proxy b -- ^ Value type
+  -> Proxy c -- ^ Value type
   -> (forall u. (Eq u) => t -> f u -> f u -> Bool) -- ^ Equality test
   -> TestTree
 testApplicativeLawComposite pf pt pa pb pc eq =
@@ -173,7 +192,7 @@ applicativeLawComposite _ _ _ _ _ eq t x y z =
 
 
 
--- | All possible selections from 1 type
+-- | All possible value type selections for @testApplicativeLaws@ from one choice
 testApplicativeLaws1
   :: ( Applicative f
      , Checkable a
@@ -183,7 +202,9 @@ testApplicativeLaws1
      , Arbitrary (f (a -> a))
      , Typeable f
      )
-  => Proxy f -> Proxy t -> Proxy a
+  => Proxy f -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context type for @f@
+  -> Proxy a -- ^ Value type
   -> (forall u. (Eq u) => t -> f u -> f u -> Bool) -- ^ Equality test
   -> TestTree
 testApplicativeLaws1 pf pt pa eq =
@@ -194,7 +215,7 @@ testApplicativeLaws1 pf pt pa eq =
 
 
 
--- | All possible selections from 2 types
+-- | All possible value type selections for @testApplicativeLaws@ from two choices
 testApplicativeLaws2
   :: ( Applicative f
      , Checkable a, Checkable b
@@ -206,7 +227,10 @@ testApplicativeLaws2
      , Arbitrary (f (b -> a)), Arbitrary (f (b -> b))
      , Typeable f
      )
-  => Proxy f -> Proxy t -> Proxy a -> Proxy b
+  => Proxy f -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @f@
+  -> Proxy a -- ^ Value type
+  -> Proxy b -- ^ Value type
   -> (forall u. (Eq u) => t -> f u -> f u -> Bool) -- ^ Equality test
   -> TestTree
 testApplicativeLaws2 pf pt pa pb eq =
@@ -224,7 +248,7 @@ testApplicativeLaws2 pf pt pa pb eq =
 
 
 
--- | All possible selections from 3 types
+-- | All possible value type selections for @testApplicativeLaws@ from three choices
 testApplicativeLaws3
   :: ( Applicative f
      , Checkable a, Checkable b, Checkable c
@@ -238,7 +262,11 @@ testApplicativeLaws3
      , Arbitrary (f (c -> a)), Arbitrary (f (c -> b)), Arbitrary (f (c -> c))
      , Typeable f
      )
-  => Proxy f -> Proxy t -> Proxy a -> Proxy b -> Proxy c
+  => Proxy f -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @f@
+  -> Proxy a -- ^ Value type
+  -> Proxy b -- ^ Value type
+  -> Proxy c -- ^ Value type
   -> (forall u. (Eq u) => t -> f u -> f u -> Bool) -- ^ Equality test
   -> TestTree
 testApplicativeLaws3 pf pt pa pb pc eq =
@@ -272,4 +300,3 @@ testApplicativeLaws3 pf pt pa pb pc eq =
     , testApplicativeLaws pf pt pc pc pb eq
     , testApplicativeLaws pf pt pc pc pc eq
     ]
-

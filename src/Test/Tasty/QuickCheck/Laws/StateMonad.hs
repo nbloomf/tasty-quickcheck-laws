@@ -40,6 +40,7 @@ import Test.Tasty.QuickCheck.Laws.Class
 
 
 
+-- | Constructs a @TestTree@ checking that the state monad laws hold for @m@ with state type @s@ and value types @a@ and @b@, using a given equality test for values of type @forall u. m u@. The equality context type @t@ is for constructors @m@ from which we can only extract a value within a context, such as reader-like constructors.
 testStateMonadLaws
   :: ( Monad m
      , Eq s, Eq a
@@ -49,10 +50,13 @@ testStateMonadLaws
      , CoArbitrary s
      , Typeable m, Typeable s, Typeable a
      )
-  => Proxy m -> Proxy t -> Proxy s -> Proxy a
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy s -- ^ State type
+  -> Proxy a -- ^ Value type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> m s -- ^ get
-  -> (s -> m ()) -- ^ put
+  -> m s -- ^ @get@
+  -> (s -> m ()) -- ^ @put@
   -> TestTree
 testStateMonadLaws pm pt ps pa eq get put =
   let
@@ -75,9 +79,11 @@ testStateMonadLawPutPut
      , Show t, Show s
      , Arbitrary t, Arbitrary s
      )
-  => Proxy m -> Proxy t -> Proxy s
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy s -- ^ State type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> (s -> m ()) -- ^ put
+  -> (s -> m ()) -- ^ @put@
   -> TestTree
 testStateMonadLawPutPut pm pt ps eq put =
   testProperty "put s1 >> put s2 === put s2" $
@@ -101,10 +107,12 @@ testStateMonadLawPutGet
      , Show t, Show s
      , Arbitrary t, Arbitrary s
      )
-  => Proxy m -> Proxy t -> Proxy s
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy s -- ^ State type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> m s -- ^ get
-  -> (s -> m ()) -- ^ put
+  -> m s -- ^ @get@
+  -> (s -> m ()) -- ^ @put@
   -> TestTree
 testStateMonadLawPutGet pm pt ps eq get put =
   testProperty "put s >> get === put s >> return s" $
@@ -127,10 +135,12 @@ testStateMonadLawGetPut
      , Show t
      , Arbitrary t
      )
-  => Proxy m -> Proxy t -> Proxy s
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy s -- ^ State type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> m s -- ^ get
-  -> (s -> m ()) -- ^ put
+  -> m s -- ^ @get@
+  -> (s -> m ()) -- ^ @put@
   -> TestTree
 testStateMonadLawGetPut pm pt ps eq get put =
   testProperty "get >>= put === return ()" $
@@ -156,9 +166,12 @@ testStateMonadLawGetGet
      , Arbitrary (m a)
      , CoArbitrary s
      )
-  => Proxy m -> Proxy t -> Proxy s -> Proxy a
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy s -- ^ State type
+  -> Proxy a -- ^ Value type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> m s -- ^ get
+  -> m s -- ^ @get@
   -> TestTree
 testStateMonadLawGetGet pm pt ps pa eq get =
   testProperty "get >>= \\s -> get >>= k s === get >>= \\s -> k s s" $

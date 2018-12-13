@@ -39,6 +39,7 @@ import Test.Tasty.QuickCheck.Laws.Class
 
 
 
+-- | Constructs a @TestTree@ checking that the reader monad laws hold for @m@ with reader type @r@ and value types @a@ and @b@, using a given equality test for values of type @forall u. m u@. The equality context type @t@ is for constructors @m@ from which we can only extract a value within a context, such as reader-like constructors.
 testReaderMonadLaws
   :: ( Monad m
      , Eq r, Eq a, Eq b
@@ -49,10 +50,14 @@ testReaderMonadLaws
      , CoArbitrary r, CoArbitrary a
      , Typeable m, Typeable r, Typeable a
      )
-  => Proxy m -> Proxy t -> Proxy r -> Proxy a -> Proxy b
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy r -- ^ Reader type
+  -> Proxy a -- ^ Value type
+  -> Proxy b -- ^ Value type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> m r -- ^ ask
-  -> (forall u. (r -> r) -> m u -> m u) -- ^ local
+  -> m r -- ^ @ask@
+  -> (forall u. (r -> r) -> m u -> m u) -- ^ @local@
   -> TestTree
 testReaderMonadLaws pm pt pr pa pb eq ask local =
   let
@@ -78,10 +83,12 @@ testReaderMonadLawLocalAsk
      , Arbitrary t, Arbitrary r
      , CoArbitrary r
      )
-  => Proxy m -> Proxy t -> Proxy r
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy r -- ^ Reader type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> m r -- ^ ask
-  -> (forall u. (r -> r) -> m u -> m u) -- ^ local
+  -> m r -- ^ @ask@
+  -> (forall u. (r -> r) -> m u -> m u) -- ^ @local@
   -> TestTree
 testReaderMonadLawLocalAsk pm pt pr eq ask local =
   testProperty "local u ask === fmap u ask" $
@@ -109,9 +116,12 @@ testReaderMonadLawLocalLocal
      , Arbitrary (m a)
      , CoArbitrary r
      )
-  => Proxy m -> Proxy t -> Proxy r -> Proxy a
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy r -- ^ Reader type
+  -> Proxy a -- ^ Value type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> (forall u. (r -> r) -> m u -> m u) -- ^ local
+  -> (forall u. (r -> r) -> m u -> m u) -- ^ @local@
   -> TestTree
 testReaderMonadLawLocalLocal pm pt pr pa eq local =
   testProperty "local u (local v x) === local (u . v) x" $
@@ -138,10 +148,13 @@ testReaderMonadLawLocalThenAsk
      , Arbitrary (m a)
      , CoArbitrary r
      )
-  => Proxy m -> Proxy t -> Proxy r -> Proxy a
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy r -- ^ Reader type
+  -> Proxy a -- ^ Value type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> m r -- ^ ask
-  -> (forall u. (r -> r) -> m u -> m u) -- ^ local
+  -> m r -- ^ @ask@
+  -> (forall u. (r -> r) -> m u -> m u) -- ^ @local@
   -> TestTree
 testReaderMonadLawLocalThenAsk pm pt pr pa eq ask local =
   testProperty "local u ask === fmap u ask" $
@@ -167,9 +180,12 @@ testReaderMonadLawLocalReturn
      , Arbitrary t, Arbitrary r, Arbitrary a
      , CoArbitrary r
      )
-  => Proxy m -> Proxy t -> Proxy r -> Proxy a
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy r -- ^ Reader type
+  -> Proxy a -- ^ Value type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> (forall u. (r -> r) -> m u -> m u) -- ^ local
+  -> (forall u. (r -> r) -> m u -> m u) -- ^ @local@
   -> TestTree
 testReaderMonadLawLocalReturn pm pt pr pa eq local =
   testProperty "local u (return a) === return a" $
@@ -196,7 +212,11 @@ testReaderMonadLawLocalBind
      , Arbitrary (m a), Arbitrary (m b)
      , CoArbitrary r, CoArbitrary a
      )
-  => Proxy m -> Proxy t -> Proxy r -> Proxy a -> Proxy b
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy r -- ^ Reader type
+  -> Proxy a -- ^ Value type
+  -> Proxy b -- ^ Value type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
   -> (forall u. (r -> r) -> m u -> m u) -- ^ local
   -> TestTree

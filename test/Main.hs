@@ -25,17 +25,35 @@ main = do
       , testMonoidLaws (Proxy :: Proxy (Maybe [()]))
       ]
     , testGroup "Functor Laws"
-      [ testFunctorLaws3 pMb pU pU pB pI (const (==))
+      [ testFunctorLaws1 pMb pU pU (const (==))
+      , testFunctorLaws1 pEi pU pU (const (==))
+      , testFunctorLaws1 pLs pU pU (const (==))
+      , testFunctorLaws2 pMb pU pU pB (const (==))
+      , testFunctorLaws2 pEi pU pU pB (const (==))
+      , testFunctorLaws2 pLs pU pU pB (const (==))
+      , testFunctorLaws3 pMb pU pU pB pI (const (==))
       , testFunctorLaws3 pEi pU pU pB pI (const (==))
       , testFunctorLaws3 pLs pU pU pB pI (const (==))
       ]
     , testGroup "Applicative Laws"
-      [ testApplicativeLaws3 pMb pU pU pB pI (const (==))
+      [ testApplicativeLaws1 pMb pU pU (const (==))
+      , testApplicativeLaws1 pEi pU pU (const (==))
+      , testApplicativeLaws1 pLs pU pU (const (==))
+      , testApplicativeLaws2 pMb pU pU pB (const (==))
+      , testApplicativeLaws2 pEi pU pU pB (const (==))
+      , testApplicativeLaws2 pLs pU pU pB (const (==))
+      , testApplicativeLaws3 pMb pU pU pB pI (const (==))
       , testApplicativeLaws3 pEi pU pU pB pI (const (==))
       , testApplicativeLaws3 pLs pU pU pB pI (const (==))
       ]
     , testGroup "Monad Laws"
-      [ testMonadLaws3 pMb pU pU pB pI (const (==))
+      [ testMonadLaws1 pMb pU pU (const (==))
+      , testMonadLaws1 pEi pU pU (const (==))
+      , testMonadLaws1 pLs pU pU (const (==))
+      , testMonadLaws2 pMb pU pU pB (const (==))
+      , testMonadLaws2 pEi pU pU pB (const (==))
+      , testMonadLaws2 pLs pU pU pB (const (==))
+      , testMonadLaws3 pMb pU pU pB pI (const (==))
       , testMonadLaws3 pEi pU pU pB pI (const (==))
       , testMonadLaws3 pLs pU pU pB pI (const (==))
       ]

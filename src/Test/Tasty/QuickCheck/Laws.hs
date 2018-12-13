@@ -1,3 +1,13 @@
+{- |
+Module      : Test.Tasty.QuickCheck.Laws
+Description : Prefab tasty trees of quickcheck properties for lawful type classes
+Copyright   : 2018, Automattic, Inc.
+License     : GPL-3
+Maintainer  : Nathan Bloomfield (nbloomf@gmail.com)
+Stability   : experimental
+Portability : POSIX
+-}
+
 module Test.Tasty.QuickCheck.Laws (
     module Test.Tasty.QuickCheck.Laws.Applicative
   , module Test.Tasty.QuickCheck.Laws.Class

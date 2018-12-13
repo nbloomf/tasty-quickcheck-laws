@@ -6,6 +6,8 @@ License     : GPL-3
 Maintainer  : Nathan Bloomfield (nbloomf@gmail.com)
 Stability   : experimental
 Portability : POSIX
+
+Prebuilt tasty test trees for the @Monad@ laws. To get started, look at @testMonadLaws@.
 -}
 
 
@@ -42,6 +44,7 @@ import Test.Tasty.QuickCheck.Laws.Class
 
 
 
+-- | Constructs a @TestTree@ checking that the @Monad@ class laws hold for @m@ with value types @a@, @b@, and @c@, using a given equality test for values of type @forall u. m u@. The equality context type @t@ is for constructors @m@ from which we can only extract a value within a context, such as reader-like constructors.
 testMonadLaws
   :: ( Monad m
      , Eq a, Eq b, Eq c
@@ -50,7 +53,11 @@ testMonadLaws
      , CoArbitrary a, CoArbitrary b
      , Typeable m, Typeable a, Typeable b, Typeable c
      )
-  => Proxy m -> Proxy t -> Proxy a -> Proxy b -> Proxy c
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy a -- ^ Value type
+  -> Proxy b -- ^ Value type
+  -> Proxy c -- ^ Value type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
   -> TestTree
 testMonadLaws pm pt pa pb pc eq =
@@ -77,7 +84,9 @@ testMonadLawRightIdentity
      , Arbitrary t
      , Arbitrary (m a)
      )
-  => Proxy m -> Proxy t -> Proxy a
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy a -- ^ Value type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
   -> TestTree
 testMonadLawRightIdentity pm pt pa eq =
@@ -86,7 +95,9 @@ testMonadLawRightIdentity pm pt pa eq =
 
 monadLawRightIdentity
   :: (Monad m, Eq a)
-  => Proxy m -> Proxy t -> Proxy a
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy a -- ^ Value type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool)
   -> t -> m a -> Bool
 monadLawRightIdentity _ _ _ eq t x =
@@ -102,7 +113,10 @@ testMonadLawLeftIdentity
      , Arbitrary a, Arbitrary t, Arbitrary (m b)
      , CoArbitrary a
      )
-  => Proxy m -> Proxy t -> Proxy a -> Proxy b
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy a -- ^ Value type
+  -> Proxy b -- ^ Value type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
   -> TestTree
 testMonadLawLeftIdentity pm pt pa pb eq =
@@ -127,7 +141,11 @@ testMonadLawAssociativity
      , Arbitrary t, Arbitrary (m a), Arbitrary (m b), Arbitrary (m c)
      , CoArbitrary a, CoArbitrary b
      )
-  => Proxy m -> Proxy t -> Proxy a -> Proxy b -> Proxy c
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy a -- ^ Value type
+  -> Proxy b -- ^ Value type
+  -> Proxy c -- ^ Value type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
   -> TestTree
 testMonadLawAssociativity pm pt pa pb pc eq =
@@ -148,7 +166,7 @@ monadLawAssociativity _ _ _ _ _ eq t x f g =
 
 
 
--- | All possible selections from 1 type
+-- | All possible value type selections for @testMonadLaws@ from one choice
 testMonadLaws1
   :: ( Monad m
      , Checkable a
@@ -156,7 +174,9 @@ testMonadLaws1
      , Arbitrary t, Arbitrary (m a)
      , Typeable m
      )
-  => Proxy m -> Proxy t -> Proxy a
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy a -- ^ Value type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
   -> TestTree
 testMonadLaws1 pm pt pa eq =
@@ -167,7 +187,7 @@ testMonadLaws1 pm pt pa eq =
 
 
 
--- | All possible selections from 2 types
+-- | All possible value type selections for @testMonadLaws@ from two choices
 testMonadLaws2
   :: ( Monad m
      , Checkable a, Checkable b
@@ -193,7 +213,7 @@ testMonadLaws2 pm pt pa pb eq =
 
 
 
--- | All possible selections from 3 types
+-- | All possible value type selections for @testMonadLaws@ from three choices
 testMonadLaws3
   :: ( Monad m
      , Checkable a, Checkable b, Checkable c

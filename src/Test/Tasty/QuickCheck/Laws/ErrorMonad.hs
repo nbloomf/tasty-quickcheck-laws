@@ -38,6 +38,7 @@ import Test.Tasty.QuickCheck.Laws.Class
 
 
 
+-- | Constructs a @TestTree@ checking that the error monad laws hold for @m@ with error type @e@ and value types @a@ and @b@, using a given equality test for values of type @forall u. m u@. The equality context type @t@ is for constructors @m@ from which we can only extract a value within a context, such as reader-like constructors.
 testErrorMonadLaws
   :: ( Monad m
      , Eq a, Eq b
@@ -47,10 +48,14 @@ testErrorMonadLaws
      , CoArbitrary e, CoArbitrary a
      , Typeable m, Typeable e, Typeable a, Typeable b
      )
-  => Proxy m -> Proxy t -> Proxy e -> Proxy a -> Proxy b
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy e -- ^ Error type
+  -> Proxy a -- ^ Value type
+  -> Proxy b -- ^ Value type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> (forall u. e -> m u) -- ^ throw
-  -> (m a -> (e -> m a) -> m a) -- ^ catch
+  -> (forall u. e -> m u) -- ^ @throw@
+  -> (m a -> (e -> m a) -> m a) -- ^ @catch@
   -> TestTree
 testErrorMonadLaws pm pt pe pa pb eq throw catch =
   let
@@ -77,9 +82,12 @@ testErrorMonadLawCatchReturn
      , Arbitrary (m a)
      , CoArbitrary e
      )
-  => Proxy m -> Proxy t -> Proxy e -> Proxy a
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy e -- ^ Error type
+  -> Proxy a -- ^ Value type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> (m a -> (e -> m a) -> m a) -- ^ catch
+  -> (m a -> (e -> m a) -> m a) -- ^ @catch@
   -> TestTree
 testErrorMonadLawCatchReturn pm pt pe pa eq catch =
   testProperty "catch (return a) h === return a" $
@@ -87,9 +95,12 @@ testErrorMonadLawCatchReturn pm pt pe pa eq catch =
 
 errorMonadLawCatchReturn
   :: (Monad m, Eq a)
-  => Proxy m -> Proxy t -> Proxy e -> Proxy a
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy e -- ^ Error type
+  -> Proxy a -- ^ Value type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> (m a -> (e -> m a) -> m a) -- ^ catch
+  -> (m a -> (e -> m a) -> m a) -- ^ @catch@
   -> t -> a -> (e -> m a) -> Bool
 errorMonadLawCatchReturn _ _ _ _ eq catch t a h =
   (eq t) (catch (return a) h) (return a)
@@ -105,10 +116,13 @@ testErrorMonadLawCatchThrow
      , Arbitrary (m a)
      , CoArbitrary e
      )
-  => Proxy m -> Proxy t -> Proxy e -> Proxy a
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy e -- ^ Error type
+  -> Proxy a -- ^ Value type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> (forall u. e -> m u) -- ^ throw
-  -> (m a -> (e -> m a) -> m a) -- ^ catch
+  -> (forall u. e -> m u) -- ^ @throw@
+  -> (m a -> (e -> m a) -> m a) -- ^ @catch@
   -> TestTree
 testErrorMonadLawCatchThrow pm pt pe pa eq throw catch =
   testProperty "catch (throw e) h === h e" $
@@ -118,8 +132,8 @@ errorMonadLawCatchThrow
   :: (Monad m, Eq a)
   => Proxy m -> Proxy t -> Proxy e -> Proxy a
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> (forall u. e -> m u) -- ^ throw
-  -> (m a -> (e -> m a) -> m a) -- ^ catch
+  -> (forall u. e -> m u) -- ^ @throw@
+  -> (m a -> (e -> m a) -> m a) -- ^ @catch@
   -> t -> e -> (e -> m a) -> Bool
 errorMonadLawCatchThrow _ _ _ _ eq throw catch t e h =
   (eq t) (catch (throw e) h) (h e)
@@ -133,10 +147,13 @@ testErrorMonadLawCatchThrowThrow
      , Show t, Show e
      , Arbitrary t, Arbitrary e
      )
-  => Proxy m -> Proxy t -> Proxy e -> Proxy a
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy e -- ^ Error type
+  -> Proxy a -- ^ Value type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> (forall u. e -> m u) -- ^ throw
-  -> (m a -> (e -> m a) -> m a) -- ^ catch
+  -> (forall u. e -> m u) -- ^ @throw@
+  -> (m a -> (e -> m a) -> m a) -- ^ @catch@
   -> TestTree
 testErrorMonadLawCatchThrowThrow pm pt pe pa eq throw catch =
   testProperty "catch (throw e) throw === throw e" $
@@ -146,8 +163,8 @@ errorMonadLawCatchThrowThrow
   :: (Monad m, Eq a)
   => Proxy m -> Proxy t -> Proxy e -> Proxy a
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> (forall u. e -> m u) -- ^ throw
-  -> (m a -> (e -> m a) -> m a) -- ^ catch
+  -> (forall u. e -> m u) -- ^ @throw@
+  -> (m a -> (e -> m a) -> m a) -- ^ @catch@
   -> t -> e -> Bool
 errorMonadLawCatchThrowThrow _ _ _ _ eq throw catch t e =
   (eq t) (catch (throw e) throw) (throw e)
@@ -163,9 +180,13 @@ testErrorMonadLawThrowBind
      , Arbitrary (m b)
      , CoArbitrary a
      )
-  => Proxy m -> Proxy t -> Proxy e -> Proxy a -> Proxy b
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy e -- ^ Error type
+  -> Proxy a -- ^ Value type
+  -> Proxy b -- ^ Value type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> (forall u. e -> m u) -- ^ throw
+  -> (forall u. e -> m u) -- ^ @throw@
   -> TestTree
 testErrorMonadLawThrowBind pm pt pe pa pb eq throw =
   testProperty "throw e >>= f === throw e" $

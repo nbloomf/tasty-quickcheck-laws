@@ -32,6 +32,7 @@ import Test.Tasty.QuickCheck.Laws.Class
 
 
 
+-- | Constructs a @TestTree@ checking that the @Eq@ class laws hold for @a@.
 testEqLaws
   :: (Eq a, Show a, Arbitrary a, Typeable a)
   => Proxy a

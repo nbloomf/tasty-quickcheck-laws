@@ -48,7 +48,9 @@ import Text.Show.Functions
 import Test.Tasty.QuickCheck.Laws.Class
 
 
-
+-- | Constructs a @TestTree@ checking that the writer monad laws hold for @m@ with writer type @w@ and value types @a@ and @b@, using a given equality test for values of type @forall u. m u@. The equality context type @t@ is for constructors @m@ from which we can only extract a value within a context, such as reader-like constructors.
+-- 
+-- We use a slightly different set of primitives for the writer laws; rather than @tell@, @listen@, and @pass@, we use @tell@ and @draft :: (Monoid w) => m a -> m (a,w)@, which is similar to @listen@ but 'resets' the writer value to @mempty@.
 testWriterMonadLaws
   :: ( Monoid w, Monad m
      , Eq w, Eq a, Eq b
@@ -59,10 +61,14 @@ testWriterMonadLaws
      , CoArbitrary a
      , Typeable m, Typeable w, Typeable a
      )
-  => Proxy m -> Proxy t -> Proxy w -> Proxy a -> Proxy b
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy w -- ^ Writer type
+  -> Proxy a -- ^ Value type
+  -> Proxy b -- ^ Value type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> (w -> m ()) -- ^ tell
-  -> (forall u. m u -> m (u,w)) -- ^ draft
+  -> (w -> m ()) -- ^ @tell@
+  -> (forall u. m u -> m (u,w)) -- ^ @draft@
   -> TestTree
 testWriterMonadLaws pm pt pw pa pb eq tell draft =
   let
@@ -87,10 +93,12 @@ testWriterMonadLawDraftTell
      , Show t, Show w
      , Arbitrary t, Arbitrary w
      )
-  => Proxy m -> Proxy t -> Proxy w
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy w -- ^ Writer type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> (w -> m ()) -- ^ tell
-  -> (forall u. m u -> m (u,w)) -- ^ draft
+  -> (w -> m ()) -- ^ @tell@
+  -> (forall u. m u -> m (u,w)) -- ^ @draft@
   -> TestTree
 testWriterMonadLawDraftTell pm pt pw eq tell draft =
   testProperty "draft (tell w) === tell w >> return ((),w)" $
@@ -114,9 +122,11 @@ testWriterMonadLawTellMempty
      , Show t
      , Arbitrary t
      )
-  => Proxy m -> Proxy t -> Proxy w
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy w -- ^ Writer type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> (w -> m ()) -- ^ tell
+  -> (w -> m ()) -- ^ @tell@
   -> TestTree
 testWriterMonadLawTellMempty pm pt pw eq tell =
   testProperty "tell mempty === return ()" $
@@ -139,9 +149,11 @@ testWriterMonadLawTellMappend
      , Show t, Show w
      , Arbitrary t, Arbitrary w
      )
-  => Proxy m -> Proxy t -> Proxy w
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy w -- ^ Writer type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> (w -> m ()) -- ^ tell
+  -> (w -> m ()) -- ^ @tell@
   -> TestTree
 testWriterMonadLawTellMappend pm pt pw eq tell =
   testProperty "tell mempty === return ()" $
@@ -165,9 +177,12 @@ testWriterMonadLawDraftReturn
      , Show t, Show a
      , Arbitrary t, Arbitrary a
      )
-  => Proxy m -> Proxy t -> Proxy w -> Proxy a
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy w -- ^ Writer type
+  -> Proxy a -- ^ Value type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> (forall u. m u -> m (u,w)) -- ^ draft
+  -> (forall u. m u -> m (u,w)) -- ^ @draft@
   -> TestTree
 testWriterMonadLawDraftReturn pm pt pw pa eq draft =
   testProperty "draft (return a) === return a" $
@@ -194,9 +209,13 @@ testWriterMonadLawDraftBind
      , Arbitrary (m a), Arbitrary (m b)
      , CoArbitrary a
      )
-  => Proxy m -> Proxy t -> Proxy w -> Proxy a -> Proxy b
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy w -- ^ Writer type
+  -> Proxy a -- ^ Value type
+  -> Proxy b -- ^ Value type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> (forall u. m u -> m (u,w)) -- ^ draft
+  -> (forall u. m u -> m (u,w)) -- ^ @draft@
   -> TestTree
 testWriterMonadLawDraftBind pm pt pw pa pb eq draft =
   testProperty "draft (x >>= f) === draft x >>= draft' f" $
@@ -252,12 +271,15 @@ testWriterMonadEquivalences
      , Arbitrary (m a), Arbitrary (m (a, w -> w))
      , Typeable m, Typeable w, Typeable a
      )
-  => Proxy m -> Proxy t -> Proxy w -> Proxy a
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy w -- ^ Writer monad
+  -> Proxy a -- ^ Value type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> (w -> m ()) -- ^ tell
-  -> (forall u. m u -> m (u,w)) -- ^ draft
-  -> (forall u. m u -> m (u,w)) -- ^ listen
-  -> (forall u. m (u, w -> w) -> m u) -- ^ pass
+  -> (w -> m ()) -- ^ @tell@
+  -> (forall u. m u -> m (u,w)) -- ^ @draft@
+  -> (forall u. m u -> m (u,w)) -- ^ @listen@
+  -> (forall u. m (u, w -> w) -> m u) -- ^ @pass@
   -> TestTree
 testWriterMonadEquivalences pm pt pw pa eq tell draft listen pass =
   let
@@ -321,11 +343,14 @@ testWriterMonadEquivalenceListen
      , Arbitrary t
      , Arbitrary (m a)
      )
-  => Proxy m -> Proxy t -> Proxy w -> Proxy a
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy w -- ^ Writer monad
+  -> Proxy a -- ^ Value type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> (w -> m ()) -- ^ tell
-  -> (forall u. m u -> m (u,w)) -- ^ draft
-  -> (forall u. m u -> m (u,w)) -- ^ listen
+  -> (w -> m ()) -- ^ @tell@
+  -> (forall u. m u -> m (u,w)) -- ^ @draft@
+  -> (forall u. m u -> m (u,w)) -- ^ @listen@
   -> TestTree
 testWriterMonadEquivalenceListen pm pt pw pa eq tell draft listen =
   testProperty "listen x === do (a,w) <- draft x; tell w; return (a,w)" $
@@ -387,11 +412,14 @@ testWriterMonadEquivalencePass
      , Arbitrary t
      , Arbitrary (m (a, w -> w))
      )
-  => Proxy m -> Proxy t -> Proxy w -> Proxy a
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy w -- ^ Writer type
+  -> Proxy a -- ^ Value type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> (w -> m ()) -- ^ tell
-  -> (forall u. m u -> m (u,w)) -- ^ draft
-  -> (forall u. m (a, w -> w) -> m a) -- ^ pass
+  -> (w -> m ()) -- ^ @tell@
+  -> (forall u. m u -> m (u,w)) -- ^ @draft@
+  -> (forall u. m (a, w -> w) -> m a) -- ^ @pass@
   -> TestTree
 testWriterMonadEquivalencePass pm pt pw pa eq tell draft pass =
   testProperty "pass u === do ((a,f),w) <- draft u; tell (f w); return a" $
@@ -450,11 +478,14 @@ testWriterMonadEquivalenceDraft
      , Arbitrary t
      , Arbitrary (m a)
      )
-  => Proxy m -> Proxy t -> Proxy w -> Proxy a
+  => Proxy m -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @m@
+  -> Proxy w -- ^ Writer type
+  -> Proxy a -- ^ Value type
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> (forall u. m u -> m (u,w)) -- ^ draft
-  -> (forall u. m u -> m (u,w)) -- ^ listen
-  -> (forall u. m (u, w -> w) -> m u) -- ^ pass
+  -> (forall u. m u -> m (u,w)) -- ^ @draft@
+  -> (forall u. m u -> m (u,w)) -- ^ @listen@
+  -> (forall u. m (u, w -> w) -> m u) -- ^ @pass@
   -> TestTree
 testWriterMonadEquivalenceDraft pm pt pw pa eq draft listen pass =
   testProperty "draft x === pass $ do (a,w) <- listen x; return ((a,w), const mempty)" $

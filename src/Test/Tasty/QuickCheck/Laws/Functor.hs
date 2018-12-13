@@ -39,6 +39,7 @@ import Test.Tasty.QuickCheck.Laws.Class
 
 
 
+-- | Constructs a @TestTree@ checking that the functor laws hold for @f@ with value types @a@, @b@, and @c@, using a given equality test for values of type @forall u. f u@. The equality context type @t@ is for constructors @f@ from which we can only extract a value within a context, such as reader-like constructors.
 testFunctorLaws
   :: ( Functor f
      , Eq a, Eq c
@@ -48,7 +49,11 @@ testFunctorLaws
      , CoArbitrary a, CoArbitrary b
      , Typeable f, Typeable a, Typeable b, Typeable c
      )
-  => Proxy f -> Proxy t -> Proxy a -> Proxy b -> Proxy c
+  => Proxy f -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @f@
+  -> Proxy a -- ^ Value type
+  -> Proxy b -- ^ Value type
+  -> Proxy c -- ^ Value type
   -> (forall u. (Eq u) => t -> f u -> f u -> Bool) -- ^ Equality test
   -> TestTree
 testFunctorLaws pf pt pa pb pc eq =
@@ -72,7 +77,9 @@ testFunctorLawIdentity
      , Show t, Show (f a)
      , Arbitrary t, Arbitrary (f a)
      )
-  => Proxy f -> Proxy t -> Proxy a
+  => Proxy f -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @f@
+  -> Proxy a -- ^ Value type
   -> (forall u. (Eq u) => t -> f u -> f u -> Bool) -- ^ Equality test
   -> TestTree
 testFunctorLawIdentity pf pt pa eq =
@@ -98,7 +105,11 @@ testFunctorLawComposite
      , Arbitrary (f a)
      , CoArbitrary a, CoArbitrary b
      )
-  => Proxy f -> Proxy t -> Proxy a -> Proxy b -> Proxy c
+  => Proxy f -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @f@
+  -> Proxy a -- ^ Value type
+  -> Proxy b -- ^ Value type
+  -> Proxy c -- ^ Value type
   -> (forall u. (Eq u) => t -> f u -> f u -> Bool) -- ^ Equality test
   -> TestTree
 testFunctorLawComposite pf pt pa pb pc eq =
@@ -117,7 +128,7 @@ functorLawComposite _ _ _ _ _ eq t x f g =
 
 
 
--- | All possible selections from 1 type
+-- | All possible value type selections for @testFunctorLaws@ from one choice
 testFunctorLaws1
   :: ( Functor f
      , Checkable a
@@ -125,7 +136,9 @@ testFunctorLaws1
      , Arbitrary t, Arbitrary (f a)
      , Typeable f
      )
-  => Proxy f -> Proxy t -> Proxy a
+  => Proxy f -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @f@
+  -> Proxy a -- ^ Value type
   -> (forall u. (Eq u) => t -> f u -> f u -> Bool) -- ^ Equality test
   -> TestTree
 testFunctorLaws1 pf pt pa eq =
@@ -136,7 +149,7 @@ testFunctorLaws1 pf pt pa eq =
 
 
 
--- | All possible selections from 2 types
+-- | All possible value type selections for @testFunctorLaws@ from two choices
 testFunctorLaws2
   :: ( Functor f
      , Checkable a, Checkable b
@@ -144,7 +157,10 @@ testFunctorLaws2
      , Arbitrary t, Arbitrary (f a), Arbitrary (f b)
      , Typeable f
      )
-  => Proxy f -> Proxy t -> Proxy a -> Proxy b
+  => Proxy f -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @f@
+  -> Proxy a -- ^ Value type
+  -> Proxy b -- ^ Value type
   -> (forall u. (Eq u) => t -> f u -> f u -> Bool) -- ^ Equality test
   -> TestTree
 testFunctorLaws2 pf pt pa pb eq =
@@ -162,7 +178,7 @@ testFunctorLaws2 pf pt pa pb eq =
 
 
 
--- | All possible selections from 3 types
+-- | All possible value type selections for @testFunctorLaws@ from three choices
 testFunctorLaws3
   :: ( Functor f
      , Checkable a, Checkable b, Checkable c
@@ -170,7 +186,11 @@ testFunctorLaws3
      , Arbitrary t, Arbitrary (f a), Arbitrary (f b), Arbitrary (f c)
      , Typeable f
      )
-  => Proxy f -> Proxy t -> Proxy a -> Proxy b -> Proxy c
+  => Proxy f -- ^ Type constructor under test
+  -> Proxy t -- ^ Equality context for @f@
+  -> Proxy a -- ^ Value type
+  -> Proxy b -- ^ Value type
+  -> Proxy c -- ^ Value type
   -> (forall u. (Eq u) => t -> f u -> f u -> Bool) -- ^ Equality test
   -> TestTree
 testFunctorLaws3 pf pt pa pb pc eq =

@@ -31,6 +31,7 @@ import Test.Tasty.QuickCheck.Laws.Class
 
 
 
+-- | Constructs a @TestTree@ checking that the @Monoid@ class laws hold for @a@.
 testMonoidLaws
   :: (Monoid a, Eq a, Show a, Arbitrary a, Typeable a)
   => Proxy a

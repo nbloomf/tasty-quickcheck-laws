@@ -1,3 +1,7 @@
-# Changelog for tasty-quickcheck-laws
+Changelog for tasty-quickcheck-laws
+===================================
 
-## Unreleased changes
+0.0.1
+-----
+
+* Initial Release
