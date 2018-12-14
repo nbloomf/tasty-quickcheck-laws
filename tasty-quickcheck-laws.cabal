@@ -1,5 +1,5 @@
 name:           tasty-quickcheck-laws
-version:        0.0.0
+version:        0.0.1
 description:    Please see the README on GitHub at <https://github.com/nbloomf/tasty-quickcheck-laws#readme>
 homepage:       https://github.com/nbloomf/tasty-quickcheck-laws#readme
 bug-reports:    https://github.com/nbloomf/tasty-quickcheck-laws/issues
@@ -10,8 +10,8 @@ license:        BSD3
 license-file:   LICENSE
 build-type:     Simple
 cabal-version:  >= 1.10
-category:       test, tasty
-synopsis:       Pre-built tasty trees of properties using QuickCheck
+category:       testing, tasty, quickcheck
+synopsis:       Pre-built tasty trees for checking lawful class properties using QuickCheck
 
 extra-source-files:
   CHANGELOG.md
