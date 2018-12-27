@@ -170,7 +170,7 @@ writerMonadLawTellMappend _ _ _ eq tell t w1 w2 =
 
 
 
--- | @draft (return a) === return a@
+-- | @draft (return a) === return (a, mempty)@
 testWriterMonadLawDraftReturn
   :: ( Monoid w, Monad m
      , Eq w, Eq a
