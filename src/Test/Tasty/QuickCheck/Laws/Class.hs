@@ -2,7 +2,7 @@
 Module      : Test.Tasty.QuickCheck.Laws.Class
 Description : Convenience typeclass
 Copyright   : 2018, Automattic, Inc.
-License     : GPL-3
+License     : BSD3
 Maintainer  : Nathan Bloomfield (nbloomf@gmail.com)
 Stability   : experimental
 Portability : POSIX
