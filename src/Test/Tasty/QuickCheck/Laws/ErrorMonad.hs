@@ -2,7 +2,7 @@
 Module      : Test.Tasty.QuickCheck.Laws.ErrorMonad
 Description : Prefab tasty trees of quickcheck properties for error monad laws
 Copyright   : 2018, Automattic, Inc.
-License     : GPL-3
+License     : BSD3
 Maintainer  : Nathan Bloomfield (nbloomf@gmail.com)
 Stability   : experimental
 Portability : POSIX

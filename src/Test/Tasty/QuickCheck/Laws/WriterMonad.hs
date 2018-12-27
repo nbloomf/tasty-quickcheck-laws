@@ -2,7 +2,7 @@
 Module      : Test.Tasty.QuickCheck.Laws.WriterMonad
 Description : Prefab tasty trees of quickcheck properties for writer monad laws
 Copyright   : 2018, Automattic, Inc.
-License     : GPL-3
+License     : BSD3
 Maintainer  : Nathan Bloomfield (nbloomf@gmail.com)
 Stability   : experimental
 Portability : POSIX
