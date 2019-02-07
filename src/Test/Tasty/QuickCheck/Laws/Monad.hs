@@ -14,7 +14,7 @@ Prebuilt tasty test trees for the @Monad@ laws. To get started, look at @testMon
 
 {-# LANGUAGE Rank2Types #-}
 module Test.Tasty.QuickCheck.Laws.Monad (
-    testMonadLaws
+     testMonadLaws
 
   -- * Monad Laws
   ,  testMonadLawRightIdentity
