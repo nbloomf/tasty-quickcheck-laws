@@ -1,8 +1,8 @@
 Changelog for tasty-quickcheck-laws
 ===================================
 
-Unreleased changes
-------------------
+0.0.2
+-----
 
 * Added
     * Maybe monad laws
