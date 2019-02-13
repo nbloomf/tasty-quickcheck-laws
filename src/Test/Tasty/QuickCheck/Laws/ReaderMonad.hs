@@ -106,7 +106,7 @@ readerMonadLawLocalAsk _ _ _ eq ask local t u =
 
 
 
--- | @local u (local v x) === local (u . v) x@
+-- | @local u (local v x) === local (v . u) x@
 testReaderMonadLawLocalLocal
   :: ( Monad m
      , Eq a
@@ -124,7 +124,7 @@ testReaderMonadLawLocalLocal
   -> (forall u. (r -> r) -> m u -> m u) -- ^ @local@
   -> TestTree
 testReaderMonadLawLocalLocal pm pt pr pa eq local =
-  testProperty "local u (local v x) === local (u . v) x" $
+  testProperty "local u (local v x) === local (v . u) x" $
     readerMonadLawLocalLocal pm pt pr pa eq local
 
 readerMonadLawLocalLocal
@@ -134,7 +134,7 @@ readerMonadLawLocalLocal
   -> (forall u. (r -> r) -> m u -> m u) -- ^ local
   -> t -> (r -> r) -> (r -> r) -> m a -> Bool
 readerMonadLawLocalLocal _ _ _ _ eq local t u v x =
-  (eq t) (local u (local v x)) (local (u . v) x)
+  (eq t) (local u (local v x)) (local (v . u) x)
 
 
 

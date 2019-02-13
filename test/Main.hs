@@ -12,7 +12,8 @@ import Test.Tasty.QuickCheck.Laws
 
 main :: IO ()
 main = do
-  setEnv "NUM_TASTY_THREADS" "6"
+  setEnv "TASTY_NUM_THREADS" "6"
+  setEnv "TASTY_QUICKCHECK_TESTS" "1000"
   defaultMain $ testGroup "Laws"
     [ testGroup "Eq Laws"
       [ testEqLaws pU
@@ -174,8 +175,8 @@ instance Applicative (Reader r) where
 instance Functor (Reader r) where
   fmap f x = x >>= (return . f)
 
-instance (Arbitrary a) => Arbitrary (Reader r a) where
-  arbitrary = return <$> arbitrary
+instance (Arbitrary a, CoArbitrary r) => Arbitrary (Reader r a) where
+  arbitrary = Reader <$> arbitrary
 
 instance Show (Reader r a) where
   show _ = "<Reader>"
