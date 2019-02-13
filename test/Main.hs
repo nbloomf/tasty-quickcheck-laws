@@ -85,6 +85,11 @@ main = do
         , testWriterMonadEquivalences (pWLs pI) pU (pLs' pI) pU (const (==)) tell draft listen pass
         ]
       ]
+    , testGroup "Maybe Monads"
+      [ testMaybeMonadLaws pMb pU pU eqMaybe Nothing
+      , testMaybeMonadLaws pMb pU pB eqMaybe Nothing
+      , testMaybeMonadLaws pMb pU pI eqMaybe Nothing
+      ]
     ]
 
 
@@ -115,6 +120,9 @@ pWU = Proxy :: Proxy (Writer ())
 pWLs = const Proxy :: Proxy a -> Proxy (Writer [a])
 
 
+
+eqMaybe :: (Eq a) => () -> Maybe a -> Maybe a -> Bool
+eqMaybe () = (==)
 
 -- Basic State Monad
 

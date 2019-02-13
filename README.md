@@ -16,3 +16,4 @@ Currently includes laws for the following type classes:
 * Reader Monad
 * Writer Monad
 * Error Monad
+* Maybe Monad
