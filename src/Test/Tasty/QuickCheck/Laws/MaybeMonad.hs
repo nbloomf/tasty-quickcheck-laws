@@ -33,7 +33,7 @@ import Test.Tasty.QuickCheck.Laws.Class
 
 
 
--- | Constructs a @TestTree@ checking that the maybe monad laws hold for @m@ with maybe type @r@ and value types @a@ and @b@, using a given equality test for values of type @forall u. m u@. The equality context type @t@ is for constructors @m@ from which we can only extract a value within a context, such as reader-like constructors.
+-- | Constructs a @TestTree@ checking that the maybe monad laws hold for @m@ with value types @a@ and @b@, using a given equality test for values of type @forall u. m u@. The equality context type @t@ is for constructors @m@ from which we can only extract a value within a context, such as reader-like constructors.
 testMaybeMonadLaws
   :: ( Monad m
      , Eq a
@@ -80,7 +80,7 @@ maybeMonadLawBailThen
   :: (Monad m, Eq a)
   => Proxy m -> Proxy t -> Proxy a
   -> (forall u. (Eq u) => t -> m u -> m u -> Bool) -- ^ Equality test
-  -> (forall a. m a) -- ^ bail
+  -> (forall a. m a) -- ^ @bail@
   -> t -> m a -> Bool
 maybeMonadLawBailThen _ _ _ eq bail t x =
   (eq t) (bail >> x) (bail)

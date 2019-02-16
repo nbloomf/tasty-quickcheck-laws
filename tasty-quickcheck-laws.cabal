@@ -42,10 +42,12 @@ library
     Test.Tasty.QuickCheck.Laws.Functor
     Test.Tasty.QuickCheck.Laws.Monad
     Test.Tasty.QuickCheck.Laws.Monoid
+    Test.Tasty.QuickCheck.Laws.Semigroup
     Test.Tasty.QuickCheck.Laws.ReaderMonad
     Test.Tasty.QuickCheck.Laws.StateMonad
     Test.Tasty.QuickCheck.Laws.WriterMonad
     Test.Tasty.QuickCheck.Laws.MaybeMonad
+    Test.Tasty.QuickCheck.Laws.IdentityMonad
 
 
 

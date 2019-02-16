@@ -8,10 +8,12 @@ Pre-built [tasty](http://hackage.haskell.org/package/tasty) trees for checking y
 Currently includes laws for the following type classes:
 
 * Eq
+* Semigroup
 * Monoid
 * Functor
 * Applicative
 * Monad
+* Identity Monad
 * State Monad
 * Reader Monad
 * Writer Monad

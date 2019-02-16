@@ -1,6 +1,13 @@
 Changelog for tasty-quickcheck-laws
 ===================================
 
+0.0.3
+-----
+
+* Added
+    * Identity monad laws
+    * Semigroup laws
+
 0.0.2
 -----
 

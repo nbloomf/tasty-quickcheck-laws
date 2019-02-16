@@ -5,6 +5,7 @@ import Data.Proxy
 import System.Environment
 import Control.Monad (ap)
 import Test.QuickCheck
+import Data.Typeable
 
 import Test.Tasty.QuickCheck.Laws
 
@@ -19,6 +20,11 @@ main = do
       [ testEqLaws pU
       , testEqLaws pB
       , testEqLaws pI
+      ]
+    , testGroup "Semigroup Laws"
+      [ testSemigroupLaws (Proxy :: Proxy [()])
+      , testSemigroupLaws (Proxy :: Proxy [Bool])
+      , testSemigroupLaws (Proxy :: Proxy (Maybe [()]))
       ]
     , testGroup "Monoid Laws"
       [ testMonoidLaws (Proxy :: Proxy [()])
@@ -57,6 +63,11 @@ main = do
       , testMonadLaws3 pMb pU pU pB pI (const (==))
       , testMonadLaws3 pEi pU pU pB pI (const (==))
       , testMonadLaws3 pLs pU pU pB pI (const (==))
+      ]
+    , testGroup "Identity Monad Laws"
+      [ testIdentityMonadLaws pId pU pU pU (const (==)) unwrap
+      , testIdentityMonadLaws pId pU pB pB (const (==)) unwrap
+      , testIdentityMonadLaws pId pU pI pI (const (==)) unwrap
       ]
     , testGroup "State Monad Laws"
       [ testStateMonadLaws pSU pU pU pU stateEq get put
@@ -116,6 +127,8 @@ pEU = Proxy :: Proxy (Error ())
 pEB = Proxy :: Proxy (Error Bool)
 pEI = Proxy :: Proxy (Error Int)
 
+pId = Proxy :: Proxy Identity
+
 pWU = Proxy :: Proxy (Writer ())
 pWLs = const Proxy :: Proxy a -> Proxy (Writer [a])
 
@@ -127,7 +140,8 @@ eqMaybe () = (==)
 -- Basic State Monad
 
 data State s a = State
-  { runState :: s -> (a,s) }
+  { runState :: s -> (a,s)
+  } deriving Typeable
 
 stateEq
   :: (Eq s, Eq a)
@@ -162,7 +176,8 @@ put s = State $ \_ -> ((),s)
 -- Basic Reader Monad
 
 data Reader r a = Reader
-  { runReader :: r -> a }
+  { runReader :: r -> a
+  } deriving Typeable
 
 readerEq
   :: (Eq a)
@@ -201,7 +216,7 @@ local u x = Reader $ \r -> runReader x (u r)
 
 data Error e a = Error
   { runError :: Either e a
-  } deriving (Eq, Show)
+  } deriving (Eq, Show, Typeable)
 
 instance Monad (Error e) where
   return a = Error (Right a)
@@ -234,7 +249,7 @@ catch x h = case x of
 
 data Writer w a = Writer
   { runWriter :: (a,w)
-  } deriving (Eq, Show)
+  } deriving (Eq, Show, Typeable)
 
 instance (Monoid w) => Monad (Writer w) where
   return a = Writer (a, mempty)
@@ -275,3 +290,30 @@ pass x =
     ((a,f),w) = runWriter x
   in
     Writer (a, f w)
+
+
+
+-- Basic Identity Monad
+
+data Identity a = Identity a
+  deriving (Eq, Show, Typeable)
+
+instance Functor Identity where
+  fmap f (Identity x) = Identity (f x)
+
+instance Applicative Identity where
+  pure = Identity
+
+  (Identity f) <*> (Identity x) =
+    Identity (f x)
+
+instance Monad Identity where
+  return = Identity
+
+  (Identity x) >>= f = f x
+
+instance (Arbitrary a) => Arbitrary (Identity a) where
+  arbitrary = Identity <$> arbitrary
+
+unwrap :: Identity a -> a
+unwrap (Identity x) = x
