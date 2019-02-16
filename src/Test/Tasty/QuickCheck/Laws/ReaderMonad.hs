@@ -138,7 +138,7 @@ readerMonadLawLocalLocal _ _ _ _ eq local t u v x =
 
 
 
--- | @local u ask === fmap u ask@
+-- | @local u x >> ask === ask >>= \r -> local u x >> return r@
 testReaderMonadLawLocalThenAsk
   :: ( Monad m
      , Eq r
@@ -157,7 +157,7 @@ testReaderMonadLawLocalThenAsk
   -> (forall u. (r -> r) -> m u -> m u) -- ^ @local@
   -> TestTree
 testReaderMonadLawLocalThenAsk pm pt pr pa eq ask local =
-  testProperty "local u ask === fmap u ask" $
+  testProperty "local u x >> ask === ask >>= \r -> local u x >> return r" $
     readerMonadLawLocalThenAsk pm pt pr pa eq ask local
 
 readerMonadLawLocalThenAsk
